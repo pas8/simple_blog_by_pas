@@ -117,8 +117,8 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
         }
         utilsChildren={
           <>
-           <CloseButton onClick={()=>setIsSearchingDialogOpen(false) }/>
-            <SaveButton onClick={()=>{}}/>
+            <CloseButton onClick={() => setIsSearchingDialogOpen(false)} />
+            <SaveButton onClick={() => {}} />
           </>
         }
       />
