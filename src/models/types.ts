@@ -17,11 +17,14 @@ export type PostType = {
   bg_image: string;
   by: { id: string; name: string };
   likes: string[];
+  collaborators: string[];
   comments: { by: string; value: string; name: string }[];
 };
 
 export type PostItemStateType = { [key: string]: { [Property in 'isLiked' | 'isWritingComment']: boolean } };
-export type StateOfCreatingPostPartPropsType = { [Propety in InputsNames | 'bg_image']: string };
+export type StateOfCreatingPostPartPropsType = { [Propety in InputsNames | 'bg_image']: string } & {
+  collaborators: string[];
+};
 
 export type CreatingPostPartPropsType = {
   submitButtonText?: string;
@@ -34,3 +37,5 @@ export type CreatingPostPartPropsType = {
 export type ProfileDocType = {
   [Property in 'email' | 'photoURL' | 'displayName']: string;
 };
+
+export type ProfileType = ProfileDocType & { id: string };
