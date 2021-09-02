@@ -1,4 +1,6 @@
+import { Dispatch, SetStateAction } from 'react';
 import { AppInitialStateType } from '../store/modules/App/types';
+import { InputsNames } from './denotation';
 
 export type ThemeType = {
   [Property in 'background' | 'text' | 'primary']: string;
@@ -19,3 +21,12 @@ export type PostType = {
 };
 
 export type PostItemStateType = { [key: string]: { [Property in 'isLiked' | 'isWritingComment']: boolean } };
+export type StateOfCreatingPostPartPropsType = { [Propety in InputsNames | 'bg_image']: string };
+
+export type CreatingPostPartPropsType = {
+  submitButtonText?: string;
+  onClickOfSubmitButton: () => void;
+  title?: string;
+  state: StateOfCreatingPostPartPropsType;
+  setState: Dispatch<SetStateAction<StateOfCreatingPostPartPropsType>>;
+};
