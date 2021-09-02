@@ -45,11 +45,9 @@ const PostContainer = styled.div`
       color: ${({ theme: { text } }) => text};
     }}
     &:hover{
-
       & .commentContainer{
-       & .iconButtonWhichAddingNewComment{ background: ${({ theme: { primary } }) => primary};}
-
-       & textarea {
+      & .iconButtonWhichAddingNewComment{ background: ${({ theme: { primary } }) => primary};}
+      & textarea {
       color: ${({ theme: { background } }) => background};
     }}
     & .dateContainer{
@@ -111,7 +109,8 @@ const TextPost = styled(Text)`
   margin: 10px 0;
 `;
 const DateContainer = styled(Caption)`
-  margin-top: -28px;
+  margin-top: -30px;
+  margin-left:4px;
   padding: 4px 6px;
   border-radius: 8px;
   border-top-left-radius: 0;
@@ -128,7 +127,7 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
   const isAuth = !!user;
   const [state, setState] = useState({
     commentValue: '',
-    isWritingComment: true,
+    isWritingComment: false,
     isLiked: likes.includes(user?.uid || '')
   });
 
@@ -193,7 +192,7 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
             viewBox={'0 0 24 24'}
             onClick={() =>
               !isAuth
-                ? toast('Only logined users can add posts! Please log in. ', {
+                ? toast('Only logined users can comment or like  posts! Please log in. ', {
                     type: 'error',
                     theme: 'colored',
                     position: 'bottom-right'
