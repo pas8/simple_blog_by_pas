@@ -68,7 +68,6 @@ const PostTitle = styled.h4`
   &:hover {
     cursor: pointer;
     color: ${({ theme: { background } }) => background};
-
     text-decoration: underline;
   }
 `;
@@ -110,7 +109,8 @@ const TextPost = styled(Text)`
 `;
 const DateContainer = styled(Caption)`
   padding: 4px 6px;
-  left:4px;
+  left: 4px;
+
   border-radius: 8px;
   border-top-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -118,9 +118,20 @@ const DateContainer = styled(Caption)`
   background: ${({ theme: { background } }) => colord(background).alpha(0.58).toHex()};
   color: ${({ theme: { text } }) => text};
   position: absolute;
-  bottom:8px;
+  bottom: 8px;
 `;
-const ImgContainer = styled.div`position:relative`
+const ImgContainer = styled.div`
+  position: relative;
+  cursor: pointer;
+`;
+const TextLink = styled(Text)`
+  &:hover {
+    cursor: pointer;
+    color: ${({ theme: { background } }) => background};
+    text-decoration: underline;
+  }
+`;
+
 const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, by, likes = [], comments = [] }) => {
   const { push } = useRouter();
   const user = useSelector(getUser);
@@ -130,6 +141,10 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
     isWritingComment: false,
     isLiked: likes.includes(user?.uid || '')
   });
+
+  useEffect(() => {
+    setState(state => ({ ...state, isLiked: likes.includes(user?.uid || '') }));
+  }, [likes, user]);
 
   const handleChangeLikedStatus = async () => {
     const ref = doc(db, 'posts', id);
@@ -170,13 +185,12 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
     setState(state => ({ ...state, isWritingComment: false, commentValue: '' }));
   };
   return (
-    <PostContainer key={`${title}_${text}_${created}`} onDoubleClick={handleChangeLikedStatus}>
+    <PostContainer key={`${title}_${text}_${created}`}>
       <PostTitle onClick={() => push(`/post/${id}`)}>{title}</PostTitle>
-    <ImgContainer >  <Img src={bg_image} /> 
-    
-    <DateContainer className={'dateContainer'}> {new Date(created).toLocaleString()}</DateContainer>
-    
-    </ImgContainer>
+      <ImgContainer onDoubleClick={handleChangeLikedStatus}>
+        <Img src={bg_image} />
+        <DateContainer className={'dateContainer'}> {new Date(created).toLocaleString()}</DateContainer>
+      </ImgContainer>
       <TextPost>{text}</TextPost>
       <PostUtilsContainer>
         {[
@@ -207,15 +221,11 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
             <path d={d} fill={value ? 'currentcolor' : 'none'} stroke={'currentcolor'} strokeWidth={2} />
           </svg>
         ))}
-        <Text> {`$_${by}`} </Text>
+        <TextLink onClick={()=> push(`profile/${by.id}`)}> {`$_${by.name}`} </TextLink>
       </PostUtilsContainer>
       <CommentContainer>
         {comments.map(({ name, value }) => {
-          return (
-            <li key={name}>
-              {`${name}    |   ${value}`}
-            </li>
-          );
+          return <li key={name}>{`${name}    |   ${value}`}</li>;
         })}
       </CommentContainer>
       {state.isWritingComment && (
