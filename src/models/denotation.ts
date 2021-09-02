@@ -16,5 +16,10 @@ export const device = {
   laptop: `(max-width: ${size.laptop})`,
   laptopL: `(max-width: ${size.laptopL})`,
   desktop: `(max-width: ${size.desktop})`,
-  desktopL: `(min-width: ${size.desktop})`,
+  desktopL: `(min-width: ${size.desktop})`
 };
+
+export enum InputsNames {
+  TITLE = 'Title',
+  TEXT = 'Text'
+}

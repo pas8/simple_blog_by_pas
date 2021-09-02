@@ -1,6 +1,6 @@
 import { colord } from 'colord';
 import { addDoc, collection, doc, getDocs, updateDoc } from 'firebase/firestore';
-import { FC, useEffect, useState } from 'react';
+import { FC, Fragment, useEffect, useState } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
@@ -9,12 +9,17 @@ import { db } from '../../layouts/FirebaseLayout';
 import { PostType } from '../../models/types';
 import { useRouter } from 'next/dist/client/router';
 import { useSelector } from 'react-redux';
+import Link from 'next/link';
+
 import { getUser } from '../../store/modules/App/selectors';
 import Caption from '../Caption';
 
 const PostContainer = styled.div`
   border-radius: 8px;
   padding:0.42em;
+  & .editIconButton{
+    display:none;
+  }
   border:1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()}};
   & .commentContainer{
     position:relative;
@@ -42,9 +47,21 @@ const PostContainer = styled.div`
       resize: none;
       width:100%;
       border:none;
-      color: ${({ theme: { text } }) => text};
     }}
+    & textarea, a {
+      color: ${({ theme: { text } }) => text};
+
+
+    };
     &:hover{
+      & a {
+
+      color: ${({ theme: { background } }) => background};
+        
+      }
+      & .editIconButton{
+        display:block;
+      }
       & .commentContainer{
       & .iconButtonWhichAddingNewComment{ background: ${({ theme: { primary } }) => primary};}
       & textarea {
@@ -61,14 +78,32 @@ const PostContainer = styled.div`
 `;
 const PostTitle = styled.h4`
   font-size: 2.42rem;
+  position: relative;
   overflow: hidden;
   text-overflow: ellipsis;
   margin: 0 0 0 0;
   user-select: none;
-  &:hover {
-    cursor: pointer;
-    color: ${({ theme: { background } }) => background};
+  & a {
+    text-decoration: none;
+  }
+  & a:hover {
     text-decoration: underline;
+  }
+  & .editIconButton {
+    position: absolute;
+    width: 1.6rem;
+    bottom: 0.42rem;
+    right: 0;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    padding: 4px;
+ 
+    &:hover {
+    cursor: pointer;
+
+      border-color: ${({ theme: { background } }) => background};
+    }
+  }
   }
 `;
 
@@ -186,7 +221,19 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
   };
   return (
     <PostContainer key={`${title}_${text}_${created}`}>
-      <PostTitle onClick={() => push(`/post/${id}`)}>{title}</PostTitle>
+      <PostTitle>
+        <Link href={`/post/${id}`}>
+          <a> {title} </a>
+        </Link>
+        {/* {user?.uid === by.id && ( */}
+          <svg viewBox="0 0 24 24" className={'editIconButton'} onClick={() => push(`/edit/${id}`)}>
+            <path
+              fill={'currentcolor'}
+              d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z"
+            ></path>
+          </svg>
+        {/* )} */}
+      </PostTitle>
       <ImgContainer onDoubleClick={handleChangeLikedStatus}>
         <Img src={bg_image} />
         <DateContainer className={'dateContainer'}> {new Date(created).toLocaleString()}</DateContainer>
@@ -196,7 +243,7 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
         {[
           {
             value: state.isLiked,
-            number: likes.length  + +state.isLiked,
+            number: likes.length,
 
             onClick: handleChangeLikedStatus,
             d: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'
@@ -208,8 +255,8 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
             d: 'M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z'
           }
         ].map(({ value, d, onClick, number }) => (
-          <>
-            <span style={{marginRight:-6}}>{number}</span>
+          <Fragment key={d}>
+            <span style={{ marginRight: -6 }}>{number}</span>
             <svg
               viewBox={'0 0 24 24'}
               onClick={() =>
@@ -221,11 +268,10 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
                     })
                   : onClick()
               }
-              key={d}
             >
               <path d={d} fill={value ? 'currentcolor' : 'none'} stroke={'currentcolor'} strokeWidth={2} />
             </svg>
-          </>
+          </Fragment>
         ))}
         <TextLink onClick={() => push(`profile/${by.id}`)}> {`$_${by.name}`} </TextLink>
       </PostUtilsContainer>
