@@ -113,9 +113,8 @@ const New = () => {
       setState(nullityState);
       push('/');
     } catch (error) {
-console.log(error)
+      console.log(error);
       toast('Something went wrong', { type: 'success', theme: 'colored', position: 'bottom-right' });
-
     }
   };
   const onChange: ChangeEventHandler<HTMLInputElement> = ({ target: { value, name } }) => {
