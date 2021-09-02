@@ -124,6 +124,7 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
         });
       })
       .catch(error => {
+        console.log(error)
         toast('Something went wrong!', {
           type: 'error',
           theme: 'colored',
