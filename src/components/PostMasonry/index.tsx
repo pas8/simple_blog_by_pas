@@ -5,18 +5,18 @@ import styled from 'styled-components';
 import { PostType } from '../../models/types';
 import Post from '../Post';
 
-const PostWrapper = styled.div` 
+const PostWrapper = styled.div`
   width: 100%;
   displat: block;
 `;
 
-const PostMasonry: FC<{ posts: PostType[] }> = ({ posts }) => {
+const PostMasonry: FC<{ posts: PostType[]; isPreviewMode?: boolean }> = ({ posts, isPreviewMode }) => {
   return (
     <ResponsiveMasonry columnsCountBreakPoints={{ 600: 1, 900: 2, 1400: 3, 1900: 4 }}>
       <Masonry gutter={'10px'}>
         {posts.map(props => (
           <PostWrapper key={props?.id}>
-            <Post {...props} />
+            <Post {...props} isPreviewMode={isPreviewMode} />
           </PostWrapper>
         ))}
       </Masonry>

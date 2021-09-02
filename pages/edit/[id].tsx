@@ -4,35 +4,14 @@ import { useRouter } from 'next/dist/client/router';
 import { FC, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import styled from 'styled-components';
 import Button from '../../src/components/Button';
 import CreatingPostPart from '../../src/components/CreatingPostPart';
+import Dialog from '../../src/components/Dialog';
 import IconButton from '../../src/components/IconButton';
-import Subtitle from '../../src/components/Subtitle';
-import Text from '../../src/components/Text';
 import { db } from '../../src/layouts/FirebaseLayout';
 import { InputsNames } from '../../src/models/denotation';
 import { PostType } from '../../src/models/types';
 import { getUser } from '../../src/store/modules/App/selectors';
-
-const DialogUtilsContainer = styled.div`display:flex;gap:12px;float:right;margin-top:24px;`
-const DialogContentContainer = styled.div`
-  padding: 1em;
-  border: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
-  border-radius: 8px;
-  margin:20px;
-  background: ${({ theme: { background } }) => background};
-`;
-
-
-const DialogContainer = styled.div`
-  position: fixed;
-  display: grid;
-  place-items: center;
-  z-index: 1000;
-  inset: 0;
-  background: ${({ theme: { background } }) => colord(background).alpha(0.8).toHex()};
-`;
 
 const EditPostPage: FC<{ post: PostType }> = ({ post }) => {
   const nullityState = { [InputsNames.TITLE]: post.Title, [InputsNames.TEXT]: post.Text, bg_image: post.bg_image };
@@ -63,7 +42,6 @@ const EditPostPage: FC<{ post: PostType }> = ({ post }) => {
         theme: 'colored',
         position: 'bottom-right'
       });
-
     } catch (error) {
       toast('Something  went wront!', {
         type: 'error',
@@ -81,8 +59,7 @@ const EditPostPage: FC<{ post: PostType }> = ({ post }) => {
         theme: 'colored',
         position: 'bottom-right'
       });
-    push('/');
-
+      push('/');
     } catch (error) {
       toast('Something  went wront!', {
         type: 'error',
@@ -90,29 +67,28 @@ const EditPostPage: FC<{ post: PostType }> = ({ post }) => {
         position: 'bottom-right'
       });
     }
-
   };
 
   const [isDefenderDialogOpen, setIsDefenderDialogOpen] = useState(false);
 
   return (
     <>
-      {isDefenderDialogOpen && (
-        <DialogContainer>
-          <DialogContentContainer>
-            <Subtitle>Are u sure that u want delete this post?</Subtitle>
-            <DialogUtilsContainer>
-              <Button onClick={() => setIsDefenderDialogOpen(false)}>Cancel</Button>
-              {
-                //@ts-ignore
-                <Button isDangerous onClick={() => handleDeletePost()}>
-                  Delete
-                </Button>
-              }
-            </DialogUtilsContainer>
-          </DialogContentContainer>
-        </DialogContainer>
-      )}
+      <Dialog
+        isOpen={isDefenderDialogOpen}
+        title={'Are u sure that u want delete this post?'}
+        utilsChildren={
+          <>
+            <Button onClick={() => setIsDefenderDialogOpen(false)}>Cancel</Button>
+            {
+              //@ts-ignore
+              <Button isDangerous onClick={() => handleDeletePost()}>
+                Delete
+              </Button>
+            }
+          </>
+        }
+      />
+
       <CreatingPostPart
         onClickOfSubmitButton={handleChangePost}
         state={state}
