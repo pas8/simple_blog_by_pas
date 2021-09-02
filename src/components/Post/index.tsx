@@ -11,8 +11,6 @@ import { useRouter } from 'next/dist/client/router';
 import { useSelector } from 'react-redux';
 import { getUser } from '../../store/modules/App/selectors';
 import Caption from '../Caption';
-import { device } from '../../models/denotation';
-import { useToastAuthDefender } from '../../hooks/useToastAuthDefender.hook';
 
 const PostContainer = styled.div`
   border-radius: 8px;
@@ -104,13 +102,14 @@ const CommentContainer = styled.ul`
   margin-block-end: 0.32em;
   padding-inline-start: 22px;
   list-style-type: '$   ';
-  & li{
-    margin-bottom:4px;  
-font-size:0.8rem;
-
+  & li {
+    margin-bottom: 4px;
+    font-size: 0.8rem;
   }
 `;
-const TextPost = styled(Text)`margin:10px 0;`
+const TextPost = styled(Text)`
+  margin: 10px 0;
+`;
 const DateContainer = styled(Caption)`
   margin-top: -28px;
   padding: 4px 6px;
@@ -123,7 +122,7 @@ const DateContainer = styled(Caption)`
   position: absolute;
 `;
 
-const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, by, likes=[], comments=[] }) => {
+const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, by, likes = [], comments = [] }) => {
   const { push } = useRouter();
   const user = useSelector(getUser);
   const isAuth = !!user;
@@ -163,15 +162,14 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
         position: 'bottom-right'
       });
     } catch (error) {
-      toast(error, {
-        type: error,
+      toast('Something  went wront!', {
+        type: 'error',
         theme: 'colored',
         position: 'bottom-right'
       });
     }
     setState(state => ({ ...state, isWritingComment: false, commentValue: '' }));
   };
-
   return (
     <PostContainer key={`${title}_${text}_${created}`} onDoubleClick={handleChangeLikedStatus}>
       <PostTitle onClick={() => push(`/post/${id}`)}>{title}</PostTitle>
@@ -191,7 +189,19 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
             d: 'M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z'
           }
         ].map(({ value, d, onClick }) => (
-          <svg viewBox={'0 0 24 24'} onClick={() => (!isAuth ? useToastAuthDefender() : onClick())} key={d}>
+          <svg
+            viewBox={'0 0 24 24'}
+            onClick={() =>
+              !isAuth
+                ? toast('Only logined users can add posts! Please log in. ', {
+                    type: 'error',
+                    theme: 'colored',
+                    position: 'bottom-right'
+                  })
+                : onClick()
+            }
+            key={d}
+          >
             <path d={d} fill={value ? 'currentcolor' : 'none'} stroke={'currentcolor'} strokeWidth={2} />
           </svg>
         ))}
@@ -200,7 +210,7 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
       <CommentContainer>
         {comments.map(({ name, value }) => {
           return (
-            <li>
+            <li key={name}>
               {name}____
               {value}
             </li>

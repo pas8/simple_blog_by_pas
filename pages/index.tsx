@@ -17,7 +17,6 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User,
 import { toast } from 'react-toastify';
 import Button from '../src/components/Button';
 import Post from '../src/components/Post';
-import { useToastAuthDefender } from '../src/hooks/useToastAuthDefender.hook';
 
 const MainContainer = styled.div`
   display: flex;
@@ -80,19 +79,19 @@ const UserPhoto = styled.img`
 `;
 
 const PostWrapper = styled.div`
-margin-bottom:1.6%;
+  margin-bottom: 1.6%;
 
-@media ${device.desktop} {
-  width: calc(33.3% - 0.4em);
-};
-@media ${device.laptopL} {
-  width: calc(50% - 0.42em);
-};
-@media ${device.tablet} {
-  margin-bottom:4%;
-  width: calc(100% - 0.96em);
-};
-`
+  @media ${device.desktop} {
+    width: calc(33.3% - 0.4em);
+  }
+  @media ${device.laptopL} {
+    width: calc(50% - 0.42em);
+  }
+  @media ${device.tablet} {
+    margin-bottom: 4%;
+    width: calc(100% - 0.96em);
+  } ;
+`;
 
 const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
   const { push } = useRouter();
@@ -165,13 +164,25 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
         </Title>
         <MainContainer>
           {posts.map(props => (
-            <PostWrapper  key={props?.id}  >
-            <Post {...props} />
+            <PostWrapper key={props?.id}>
+              <Post {...props} />
             </PostWrapper>
           ))}
         </MainContainer>
       </Container>
-      <AddButton onClick={() => (!isAuth ? useToastAuthDefender() : push('/new'))}>+ </AddButton>
+      <AddButton
+        onClick={() =>
+          !isAuth
+            ? toast('Only logined users can add posts! Please log in. ', {
+                type: 'error',
+                theme: 'colored',
+                position: 'bottom-right'
+              })
+            : push('/new')
+        }
+      >
+        +{' '}
+      </AddButton>
     </>
   );
 };

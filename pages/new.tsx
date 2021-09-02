@@ -82,7 +82,7 @@ const New = () => {
       const bg_image = await getDownloadURL(storageRef);
       setState(state => ({ ...state, bg_image }));
     } catch (error) {
-      toast(error, { type: 'error', theme: 'dark', position: 'bottom-right' });
+      toast('Something went wrond', { type: 'error', theme: 'dark', position: 'bottom-right' });
     }
   }, []);
 
