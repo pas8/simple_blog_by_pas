@@ -5,6 +5,8 @@ import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { mapValues } from 'lodash';
 import styled from 'styled-components';
+//@ts-ignore
+import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import IconButton from '../src/components/IconButton';
 import { db } from '../src/layouts/FirebaseLayout';
 import { device } from '../src/models/denotation';
@@ -20,12 +22,6 @@ import Post from '../src/components/Post';
 import dynamic from 'next/dynamic';
 
 const MainTitle = dynamic(() => import('../src/components/MainTitle'), { ssr: false });
-
-const MainContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-`;
 
 const AddButton = styled.button`
   outline: none;
@@ -81,19 +77,9 @@ const UserPhoto = styled.img`
   height: 3rem;
 `;
 
-const PostWrapper = styled.div`
-  margin-bottom: 1.6%;
-
-  @media ${device.desktop} {
-    width: calc(33.3% - 0.4em);
-  }
-  @media ${device.laptopL} {
-    width: calc(50% - 0.42em);
-  }
-  @media ${device.tablet} {
-    margin-bottom: 4%;
-    width: calc(100% - 0.96em);
-  } ;
+const PostWrapper = styled.div` 
+  width: 100%;
+  displat: block;
 `;
 
 const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
@@ -166,13 +152,15 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
             )}
           </HeaderUtilsContainer>
         </Title>
-        <MainContainer>
-          {posts.map(props => (
-            <PostWrapper key={props?.id}>
-              <Post {...props} />
-            </PostWrapper>
-          ))}
-        </MainContainer>
+        <ResponsiveMasonry columnsCountBreakPoints={{ 600: 1, 900: 2, 1400: 3, 1900: 4 }}>
+          <Masonry gutter={'10px'}>
+            {posts.map(props => (
+              <PostWrapper key={props?.id}>
+                <Post {...props} />
+              </PostWrapper>
+            ))}
+          </Masonry>
+        </ResponsiveMasonry>
       </Container>
       <AddButton
         onClick={() =>

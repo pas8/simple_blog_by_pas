@@ -109,9 +109,8 @@ const TextPost = styled(Text)`
   margin: 10px 0;
 `;
 const DateContainer = styled(Caption)`
-  margin-top: -30px;
-  margin-left:4px;
   padding: 4px 6px;
+  left:4px;
   border-radius: 8px;
   border-top-left-radius: 0;
   border-bottom-right-radius: 0;
@@ -119,8 +118,9 @@ const DateContainer = styled(Caption)`
   background: ${({ theme: { background } }) => colord(background).alpha(0.58).toHex()};
   color: ${({ theme: { text } }) => text};
   position: absolute;
+  bottom:8px;
 `;
-
+const ImgContainer = styled.div`position:relative`
 const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, by, likes = [], comments = [] }) => {
   const { push } = useRouter();
   const user = useSelector(getUser);
@@ -172,8 +172,11 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
   return (
     <PostContainer key={`${title}_${text}_${created}`} onDoubleClick={handleChangeLikedStatus}>
       <PostTitle onClick={() => push(`/post/${id}`)}>{title}</PostTitle>
-      <Img src={bg_image} />
-      <DateContainer className={'dateContainer'}> {new Date(created).toLocaleString()}</DateContainer>
+    <ImgContainer >  <Img src={bg_image} /> 
+    
+    <DateContainer className={'dateContainer'}> {new Date(created).toLocaleString()}</DateContainer>
+    
+    </ImgContainer>
       <TextPost>{text}</TextPost>
       <PostUtilsContainer>
         {[
@@ -210,8 +213,7 @@ const Post: FC<PostType> = ({ Title: title, Text: text, created, id, bg_image, b
         {comments.map(({ name, value }) => {
           return (
             <li key={name}>
-              {name}____
-              {value}
+              {`${name}    |   ${value}`}
             </li>
           );
         })}

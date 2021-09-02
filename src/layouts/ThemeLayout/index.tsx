@@ -9,6 +9,13 @@ const MainContainer = styled.main`
   font-family: 'system-ui';
   // position:relative;
   color: ${({ theme: { text } }) => text};
+  
+  @media ${device.desktopL} {
+    width: 56vw;
+  }
+  @media ${device.desktop} {
+    width: 60vw;
+  }
   @media ${device.desktop} {
     width: 60vw;
   }
