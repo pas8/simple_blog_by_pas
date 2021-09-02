@@ -5,8 +5,6 @@ import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { mapValues } from 'lodash';
 import styled from 'styled-components';
-//@ts-ignore
-import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import IconButton from '../src/components/IconButton';
 import { db } from '../src/layouts/FirebaseLayout';
 import { device } from '../src/models/denotation';
@@ -18,8 +16,8 @@ import { PostType } from '../src/models/types';
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { toast } from 'react-toastify';
 import Button from '../src/components/Button';
-import Post from '../src/components/Post';
 import dynamic from 'next/dynamic';
+import PostMasonry from '../src/components/PostMasonry';
 
 const MainTitle = dynamic(() => import('../src/components/MainTitle'), { ssr: false });
 
@@ -72,14 +70,14 @@ const HeaderUtilsContainer = styled.div`
 `;
 
 const UserPhoto = styled.img`
-  width: 3rem;
+  width: 2.8rem;
   border-radius: 50%;
-  height: 3rem;
-`;
-
-const PostWrapper = styled.div` 
-  width: 100%;
-  displat: block;
+  height: 2.8rem;
+  border:1px solid ${({ theme: { text } }) => text};
+  &:hover {
+    cursor: pointer;
+    border-color: ${({ theme: { primary } }) => primary};
+  }
 `;
 
 const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
@@ -147,20 +145,12 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
                   position={'relative'}
                   d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
                 />
-                <UserPhoto src={user?.photoURL || ''} />
+                <UserPhoto src={user?.photoURL || ''} onClick={() => push(`profile/${user?.uid}`)} />
               </>
             )}
           </HeaderUtilsContainer>
         </Title>
-        <ResponsiveMasonry columnsCountBreakPoints={{ 600: 1, 900: 2, 1400: 3, 1900: 4 }}>
-          <Masonry gutter={'10px'}>
-            {posts.map(props => (
-              <PostWrapper key={props?.id}>
-                <Post {...props} />
-              </PostWrapper>
-            ))}
-          </Masonry>
-        </ResponsiveMasonry>
+        <PostMasonry posts={posts} />
       </Container>
       <AddButton
         onClick={() =>

@@ -93,25 +93,30 @@ const New = () => {
   });
 
   const handleAddNewPost = async () => {
-    if (!every(values(state), el => !!el))
-      return toast('You should add photo, title and text', {
+    // if (!every(values(state), el => !!el))
+    if (!state.bg_image)
+      return toast('You should add photo altghouth.', {
         type: 'error',
         theme: 'colored',
         position: 'bottom-right'
       });
+    try {
+      const { id } = await addDoc(collection(db, 'posts'), {
+        ...state,
+        created: Date.now(),
+        likes: [],
+        comments: [],
+        by: { name: user?.displayName || user?.email, id: user?.uid }
+      });
+      if (!id) return;
+      toast('New posts was successfully added', { type: 'success', theme: 'colored', position: 'bottom-right' });
+      setState(nullityState);
+      push('/');
+    } catch (error) {
+console.log(error)
+      toast('Something went wrong', { type: 'success', theme: 'colored', position: 'bottom-right' });
 
-    const { id } = await addDoc(collection(db, 'posts'), {
-      ...state,
-      created: Date.now(),
-      likes: [],
-      comments: [],
-      by: user?.displayName || user?.email
-    });
-    if (!id) return;
-
-    toast('New posts was successfully added', { type: 'success', theme: 'colored', position: 'bottom-right' });
-    setState(nullityState);
-    push('/');
+    }
   };
   const onChange: ChangeEventHandler<HTMLInputElement> = ({ target: { value, name } }) => {
     setState(state => ({ ...state, [name]: value }));
