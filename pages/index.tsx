@@ -17,6 +17,9 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User,
 import { toast } from 'react-toastify';
 import Button from '../src/components/Button';
 import Post from '../src/components/Post';
+import dynamic from 'next/dynamic';
+
+const MainTitle = dynamic(() => import('../src/components/MainTitle'), { ssr: false });
 
 const MainContainer = styled.div`
   display: flex;
@@ -124,7 +127,7 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
         });
       })
       .catch(error => {
-        console.log(error)
+        console.log(error);
         toast('Something went wrong!', {
           type: 'error',
           theme: 'colored',
@@ -138,7 +141,7 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
     <>
       <Container>
         <Title>
-          Simple blog
+          <MainTitle />
           <HeaderUtilsContainer>
             <IconButton
               position={'relative'}
