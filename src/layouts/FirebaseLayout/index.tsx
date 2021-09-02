@@ -4,7 +4,7 @@ import { getFirestore } from "firebase/firestore"
 import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
-  apiKey: process.env.DB_KEY,
+  apiKey: 'AIzaSyAPQBWtnZJWSUG4j96HZ5UMBBYV0deQK6M',
   authDomain: 'simpleblog-ae929.firebaseapp.com',
   projectId: 'simpleblog-ae929',
   storageBucket: 'simpleblog-ae929.appspot.com',
