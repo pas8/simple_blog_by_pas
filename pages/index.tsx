@@ -1,5 +1,5 @@
 import { colord } from 'colord';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/dist/client/router';
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,6 +24,9 @@ const MainTitle = dynamic(() => import('../src/components/MainTitle'), { ssr: fa
 const AddButton = styled.button`
   outline: none;
   border: none;
+  box-shadow: 0px 5px 5px -3px ${({ theme: { primary } }) => colord(primary).alpha(0.2).toHex()},
+    0px 8px 10px 1px ${({ theme: { primary } }) => colord(primary).alpha(0.14).toHex()},
+    0px 3px 14px 2px ${({ theme: { primary } }) => colord(primary).alpha(0.12).toHex()};
   border-radius: 50%;
   width: 5.6rem;
   cursor: pointer;
@@ -73,7 +76,7 @@ const UserPhoto = styled.img`
   width: 2.8rem;
   border-radius: 50%;
   height: 2.8rem;
-  border:1px solid ${({ theme: { text } }) => text};
+  border: 1px solid ${({ theme: { text } }) => text};
   &:hover {
     cursor: pointer;
     border-color: ${({ theme: { primary } }) => primary};
@@ -99,26 +102,31 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
     dispatch(toChangeUser({ user: User }));
   });
 
-  const handleAuthorisate = () => {
+  const handleAuthorisate = async () => {
     const provider = new GoogleAuthProvider();
 
-    signInWithPopup(auth, provider)
-      .then(result => {
-        toast('Successfully log in!', {
-          type: 'success',
-          theme: 'colored',
-          position: 'bottom-right'
-        });
-      })
-      .catch(error => {
-        console.log(error);
-        toast('Something went wrong!', {
-          type: 'error',
-          theme: 'colored',
-          position: 'bottom-right'
-        });
-        // ...
+    try {
+      const { user } = await signInWithPopup(auth, provider);
+      const { uid, photoURL, displayName, email } = user;
+
+      const f = await setDoc(doc(db, 'users', uid), {
+        photoURL,
+        displayName,
+        email
       });
+      toast('Successfully log in!', {
+        type: 'success',
+        theme: 'colored',
+        position: 'bottom-right'
+      });
+    } catch (error) {
+      console.log(error);
+      toast('Something went wrong!', {
+        type: 'error',
+        theme: 'colored',
+        position: 'bottom-right'
+      });
+    }
   };
 
   return (
@@ -150,7 +158,7 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
             )}
           </HeaderUtilsContainer>
         </Title>
-        <PostMasonry posts={posts} />
+        <PostMasonry posts={posts} isPreviewMode />
       </Container>
       <AddButton
         onClick={() =>

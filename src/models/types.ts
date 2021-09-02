@@ -30,3 +30,7 @@ export type CreatingPostPartPropsType = {
   state: StateOfCreatingPostPartPropsType;
   setState: Dispatch<SetStateAction<StateOfCreatingPostPartPropsType>>;
 };
+
+export type ProfileDocType = {
+  [Property in 'email' | 'photoURL' | 'displayName']: string;
+};
