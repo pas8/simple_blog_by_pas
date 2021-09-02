@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { getStorage, listAll, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useDropzone } from 'react-dropzone';
 import { colord } from 'colord';
-import { CreatingPostPartPropsType } from '../../models/types';
+import { CreatingPostPartPropsType, ProfileDocType, ProfileType } from '../../models/types';
 import { InputsNames } from '../../models/denotation';
 import Input from '../Input';
 import Button from '../Button';
@@ -15,6 +15,11 @@ import IconButton from '../IconButton';
 import Dialog from '../Dialog';
 import CloseButton from '../CloseButton';
 import SaveButton from '../SaveButton';
+import Caption from '../Caption';
+import Text from '../Text';
+import { collection, getDocs, query, startAt, where, orderBy, endAt } from 'firebase/firestore';
+import { db } from '../../layouts/FirebaseLayout';
+import SearchLabel from './components/SearchLabel';
 
 const TitleInput = styled(Input)`
   width: calc(100% - 0.96em);
@@ -41,6 +46,16 @@ const TextArea = styled(TextareaAutosize)`
 `;
 
 const AddPostButton = styled(Button)``;
+const DialogContentContainer = styled.div`
+  display: flex;
+  & .containerOfSearchLabel {
+    margin-bottom: 8px;
+    display: flex;
+    gap: 8px;
+    margin-top: -6px;
+  }
+  flex-direction: column;
+`;
 
 const ImgPreview = styled.img`
   border-radius: 8px;
@@ -66,6 +81,40 @@ const UtilsContainer = styled.div`
   justify-content: flex-end;
   gap: 16px;
 `;
+
+const SearchContainer = styled.div`
+  border-radius: 8px;
+  border: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
+
+  overflow: hidden;
+  & .searchItemContainer {
+    color: ${({ theme: { text } }) => text};
+
+    border-bottom: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.16).toHex()};
+    &:hover {
+      cursor: pointer;
+      background: ${({ theme: { text } }) => colord(text).alpha(0.16).toHex()};
+    }
+    display: flex;
+    & img {
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    padding: 10px;
+  }
+  & .selected {
+    background: ${({ theme: { primary } }) => primary};
+    color: ${({ theme: { background } }) => background};
+    &:hover {
+      background: ${({ theme: { primary } }) => colord(primary).alpha(0.8).toHex()};
+    }
+  }
+`;
+const CollobaratorsContainer = styled.div`
+   gap: 8px;
+margin-bottom:10px;
+display:flex;
+`
 
 const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
   submitButtonText = 'Add New Post',
@@ -103,22 +152,72 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
   const onChange: ChangeEventHandler<HTMLInputElement> = ({ target: { value, name } }) => {
     setState(state => ({ ...state, [name]: value }));
   };
-  // const handleSave
 
+  const [queryUsers, setQueryUsers] = useState<ProfileType[]>([] as ProfileType[]);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [searchValue, setSearchValue] = useState('');
+  const on: ChangeEventHandler<HTMLInputElement> = async ({ target: { value } }) => {
+    setSearchValue(value);
+    const isName = value.startsWith('$');
+    const isEmail = value.startsWith('@');
+    if ((!isEmail && !isName) || value.length === 1) return setQueryUsers([]);
+    const str = value.slice(1);
+    const q = query(collection(db, 'users'), orderBy(isName ? 'displayName' : 'email'), startAt(str), endAt(str + '~'));
+    const querySnapshot = await getDocs(q);
+    const users: ProfileType[] = [];
+
+    querySnapshot.forEach(async doc => {
+      users.push({ ...doc.data(), id: doc.id } as ProfileType);
+    });
+    setQueryUsers(users);
+  };
+  const handleSaveCollobarators = () => {
+    setState(state => ({ ...state, collaborators: selectedUsers }));
+    setQueryUsers([]);
+    setSearchValue('');
+    setIsSearchingDialogOpen(false)
+  };
   return (
     <>
       <Dialog
         isOpen={isSearchingDialogOpen}
         title={'Add collobarators'}
         contentChildren={
-          <>
-            <TitleInput />
-          </>
+          <DialogContentContainer>
+            <TitleInput onChange={on} value={searchValue} placeholder={'*start search with @ or $'} />
+            <div className={'containerOfSearchLabel'}>
+              {selectedUsers.map(id => (
+                <SearchLabel key={id} id={id} />
+              ))}
+            </div>
+
+            {!!queryUsers.length && (
+              <SearchContainer>
+                {[...queryUsers].map(({ displayName, email, photoURL, id }, idx) => {
+                  const isSelected = selectedUsers.includes(id);
+                  return (
+                    <div
+                      className={`searchItemContainer ${isSelected && 'selected'}`}
+                      key={email + idx}
+                      onClick={() =>
+                        setSelectedUsers(state =>
+                          state.includes(id) ? state.filter(elId => elId !== id) : [...state, id]
+                        )
+                      }
+                    >
+                      <img src={photoURL} width={24} height={24} />{' '}
+                      <span>{searchValue.startsWith('$') ? `$${displayName}` : `${email}`} </span>
+                    </div>
+                  );
+                })}
+              </SearchContainer>
+            )}
+          </DialogContentContainer>
         }
         utilsChildren={
           <>
             <CloseButton onClick={() => setIsSearchingDialogOpen(false)} />
-            <SaveButton onClick={() => {}} />
+            <SaveButton onClick={handleSaveCollobarators} />
           </>
         }
       />
@@ -142,6 +241,11 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
           <div style={{ width: titleRef?.current?.offsetWidth }}>
             {!!state.bg_image && <ImgPreview src={state.bg_image} />}{' '}
           </div>
+          <CollobaratorsContainer>
+            {state.collaborators.map(id => (
+              <SearchLabel key={id} id={id} />
+            ))}
+          </CollobaratorsContainer>
           <TitleInput
             autoFocus
             placeholder={InputsNames.TITLE}

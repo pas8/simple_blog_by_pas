@@ -17,6 +17,7 @@ const DialogMainContainer = styled.div`
 
 const DialogContentContainer = styled.div`
   padding: 1em;
+  transition:.4s easy all;
   border: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
   border-radius: 8px;
   margin: 20px;

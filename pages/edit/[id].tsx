@@ -14,7 +14,12 @@ import { PostType } from '../../src/models/types';
 import { getUser } from '../../src/store/modules/App/selectors';
 
 const EditPostPage: FC<{ post: PostType }> = ({ post }) => {
-  const nullityState = { [InputsNames.TITLE]: post.Title, [InputsNames.TEXT]: post.Text, bg_image: post.bg_image };
+  const nullityState = {
+    [InputsNames.TITLE]: post.Title,
+    [InputsNames.TEXT]: post.Text,
+    bg_image: post.bg_image,
+    collaborators: post.collaborators
+  };
 
   const [state, setState] = useState(nullityState);
   const {
