@@ -55,6 +55,6 @@ export const getServerSideProps = async (context: any) => {
     posts.push({ ...doc.data(), id: doc.id } as PostType);
   });
   return {
-    props: { posts: posts.sort(({ created }, __) => __.created - created), profileUser }
+    props: { posts: posts.sort(({ created }, __) => __.created - created), profileUser: profileUser.data() }
   };
 };
