@@ -45,3 +45,19 @@ export type ProfileDocType = {
 export type ProfileType = ProfileDocType & { id: string };
 
 export type MessageType = { id: string; created: number; value: string; by: string; isEdited: boolean };
+export type ChatMessageMenuPropsType = {
+  isPrivateMode?: boolean;
+  handleDeleteMessage: (id: string) => void;
+  handleUpdateMessage: (id: string, value: string) => void;
+};
+
+export type ChatMainPartPropsType = {
+  messages: MessageType[];
+  title?: string;
+  titleURL?:string;
+  titlePhoto?: string;
+
+  handleAddMessage: () => void;
+  messageValue: string;
+  setMessageValue: Dispatch<SetStateAction<string>>;
+} & ChatMessageMenuPropsType;

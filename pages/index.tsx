@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import Button from '../src/components/Button';
 import dynamic from 'next/dynamic';
 import PostMasonry from '../src/components/PostMasonry';
+import UserPhoto from '../src/components/UserPhoto';
 
 const MainTitle = dynamic(() => import('../src/components/MainTitle'), { ssr: false });
 
@@ -72,16 +73,7 @@ const HeaderUtilsContainer = styled.div`
   gap: 10px;
 `;
 
-const UserPhoto = styled.img`
-  width: 2.8rem;
-  border-radius: 50%;
-  height: 2.8rem;
-  border: 1px solid ${({ theme: { text } }) => text};
-  &:hover {
-    cursor: pointer;
-    border-color: ${({ theme: { primary } }) => primary};
-  }
-`;
+
 
 const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
   const { push } = useRouter();
@@ -184,7 +176,7 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
                   position={'relative'}
                   d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
                 />
-                <UserPhoto src={user?.photoURL || ''} onClick={() => push(`profile/${user?.id}`)} />
+                <UserPhoto src={user?.photoURL || ''} onClick={() => push(`/profile/${user?.id}`)} />
               </>
             )}
           </HeaderUtilsContainer>

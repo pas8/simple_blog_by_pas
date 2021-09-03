@@ -44,7 +44,6 @@ const MessageSelfContainer = styled(MessageContainer)`
   background: ${({ theme: { primary } }) => primary};
 
   color: ${({ theme: { background } }) => background};
-  border: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
 `;
 
 const MessageItem: FC<MessageType & { isSelfMessage: boolean }> = ({ isSelfMessage, ...messageProps }) => {

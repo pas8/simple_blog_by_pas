@@ -29,9 +29,9 @@ const SearchLabel: FC<{ id: string }> = ({ id }) => {
     handleSetProfileData();
   }, [id]);
   if (!userProfileData) return <></>;
-  
+
   return (
-    <SearchLabelContainer>
+    <SearchLabelContainer className={'searchLabelContainer'}>
       <img src={userProfileData?.photoURL || ''} width={24} height={24} />
       {`$${userProfileData?.displayName}` || userProfileData?.email}{' '}
     </SearchLabelContainer>
