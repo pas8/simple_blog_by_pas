@@ -1,5 +1,6 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
+import { useRouter } from 'next/dist/client/router';
 import { FC, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { ProfileType } from '../../models/types';
@@ -13,9 +14,11 @@ const AuthLayout: FC = ({ children }) => {
   onAuthStateChanged(auth, user => {
     setId(user?.uid || '');
   });
+  const { push } = useRouter();
 
   useEffect(() => {
     if (!id) return;
+
     const handleUploadUser = async () => {
       const profileDoc = doc(db, 'users', id);
       const profileUser = await getDoc(profileDoc);
