@@ -4,16 +4,16 @@ import { useTheme } from 'styled-components';
 import 'react-toastify/dist/ReactToastify.css';
 import { ThemeType } from '../../models/types';
 import { ToastContainer } from 'react-toastify';
+import { useSelector } from 'react-redux';
+import { getThemePropertyies } from '../../store/modules/App/selectors';
 
 const SnackBarLayout: FC = ({ children }) => {
-  const theme = useTheme() as ThemeType;
+  const themePropertyies = useSelector(getThemePropertyies);
   return (
     <>
-
-      <NextNProgress color={theme?.primary} />
+      <NextNProgress color={themePropertyies?.primary} />
       {children}
       <ToastContainer />
-
     </>
   );
 };

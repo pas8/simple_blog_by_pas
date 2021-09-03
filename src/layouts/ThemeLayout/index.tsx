@@ -1,11 +1,12 @@
-import { FC, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { colord } from 'colord';
+import { mapValues } from 'lodash';
+import { FC, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
 import MainContainer from '../../components/MainContainer';
 import { device } from '../../models/denotation';
-import { getThemePropertyies } from '../../store/modules/App/selectors';
-
-
+import { toChangeThemePropertyies } from '../../store/modules/App/actions';
+import { getThemePropertyies, getUser } from '../../store/modules/App/selectors';
 
 const GlobalStyle = createGlobalStyle`body{margin:0;fontFamily;display:flex;justify-content:center;background:${({
   theme: { background }
@@ -13,7 +14,15 @@ const GlobalStyle = createGlobalStyle`body{margin:0;fontFamily;display:flex;just
 
 const ThemeLayout: FC = ({ children }) => {
   const theme = useSelector(getThemePropertyies);
+  const user = useSelector(getUser);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    if (!user) return;
 
+
+    const themePropertyies = user.isThemeDark ? theme : mapValues(theme, el => colord(el).invert().toHex());
+    dispatch(toChangeThemePropertyies({ themePropertyies: { ...themePropertyies, primary: user.primaryColor } }));
+  }, [user]);
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />

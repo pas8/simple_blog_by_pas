@@ -7,11 +7,13 @@ import Post from '../Post';
 
 const PostWrapper = styled.div`
   width: 100%;
-  displat: block;
 `;
-
+const Container = styled.div`
+padding-bottom:20px;
+`
 const PostMasonry: FC<{ posts: PostType[]; isPreviewMode?: boolean }> = ({ posts, isPreviewMode }) => {
   return (
+    <Container>
     <ResponsiveMasonry columnsCountBreakPoints={{ 600: 1, 900: 2, 1400: 3, 1900: 4 }}>
       <Masonry gutter={'10px'}>
         {posts.map(props => (
@@ -21,6 +23,7 @@ const PostMasonry: FC<{ posts: PostType[]; isPreviewMode?: boolean }> = ({ posts
         ))}
       </Masonry>
     </ResponsiveMasonry>
+    </Container>
   );
 };
 

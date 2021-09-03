@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import { ThemeType } from './../../../models/types';
+import { ThemeType, ProfileType } from './../../../models/types';
 import { $Values, Optional } from 'utility-types';
 import { TypeNames } from './enums';
 
@@ -8,7 +8,7 @@ export type PayloadTypes = {
     themePropertyies: ThemeType;
   };
   [TypeNames.HANDLE_CHANGE_USER]: {
-    user: User | null;
+    user: ProfileType | null;
   };
 };
 
@@ -26,5 +26,5 @@ export type AppActionTypes = $Values<ActionsValueTypes>;
 
 export type AppInitialStateType = {
   themePropertyies: ThemeType;
-  user: User | null;
+  user: ProfileType | null;
 };

@@ -37,6 +37,9 @@ export type CreatingPostPartPropsType = {
 
 export type ProfileDocType = {
   [Property in 'email' | 'photoURL' | 'displayName']: string;
+} & {
+  primaryColor: string;
+  isThemeDark: boolean;
 };
 
 export type ProfileType = ProfileDocType & { id: string };

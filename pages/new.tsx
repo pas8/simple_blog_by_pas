@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { addDoc, collection } from 'firebase/firestore';
 import { useRouter } from 'next/dist/client/router';
@@ -14,7 +14,7 @@ const New = () => {
 
   const [state, setState] = useState(nullityState);
   const { push } = useRouter();
-  if (!user?.uid) push('/');
+ 
   const handleAddNewPost = async () => {
     if (!state.bg_image || !state[InputsNames.TITLE])
       return toast('You should add photo and title altghouth.', {
@@ -28,7 +28,7 @@ const New = () => {
         created: Date.now(),
         likes: [],
         comments: [],
-        maintainer: user?.uid
+        maintainer: user?.id
       });
       if (!id) return;
       toast('New posts was successfully added', { type: 'success', theme: 'colored', position: 'bottom-right' });
@@ -45,7 +45,7 @@ const New = () => {
       onClickOfSubmitButton={handleAddNewPost}
       state={state}
       setState={setState}
-      maintainer={user?.uid || ''}
+      maintainer={user?.id || ''}
     />
   );
 };
