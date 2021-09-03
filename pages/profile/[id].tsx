@@ -19,6 +19,7 @@ import SaveButton from '../../src/components/SaveButton';
 import { toChangeThemePropertyies } from '../../src/store/modules/App/actions';
 import { colord } from 'colord';
 import { toast } from 'react-toastify';
+import Subtitle from '../../src/components/Subtitle';
 
 const ProfileContainer = dynamic(() => import('../../src/components/ProfileContainer'), { ssr: false });
 
@@ -94,7 +95,6 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
                     theme: 'colored',
                     position: 'bottom-right'
                   });
-
                 } catch (error) {
                   console.log(error);
                   toast('Something went wrong', { type: 'error', theme: 'colored', position: 'bottom-right' });
@@ -124,7 +124,8 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
             </TitleWrapper>
           </Title>
         </ProfileContainer>
-        <PostMasonry posts={posts} />
+
+        {!!posts.length ? <PostMasonry posts={posts} /> : <Subtitle>No posts was created by this user :(</Subtitle>}
       </CenteredContainerWithBackButton>
     </>
   );

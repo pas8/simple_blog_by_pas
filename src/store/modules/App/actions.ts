@@ -8,10 +8,14 @@ export const toChangeThemePropertyies = (
   payload
 });
 
-export const toChangeUser = (
-  payload: PayloadTypes[TypeNames.HANDLE_CHANGE_USER]
-): AppActionTypes => ({
+export const toChangeUser = (payload: PayloadTypes[TypeNames.HANDLE_CHANGE_USER]): AppActionTypes => ({
   type: TypeNames.HANDLE_CHANGE_USER,
   payload
 });
 
+export const toChangeMessageMenuProperties = (
+  payload: PayloadTypes[TypeNames.HANDLE_CHANGE_MESSAGE_MENU_PROPERTIES]
+): AppActionTypes => ({
+  type: TypeNames.HANDLE_CHANGE_MESSAGE_MENU_PROPERTIES,
+  payload
+});

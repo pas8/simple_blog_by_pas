@@ -43,3 +43,5 @@ export type ProfileDocType = {
 };
 
 export type ProfileType = ProfileDocType & { id: string };
+
+export type MessageType = { id: string; created: number; value: string; by: string; isEdited: boolean };

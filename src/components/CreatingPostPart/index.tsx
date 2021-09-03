@@ -1,6 +1,5 @@
 import { ChangeEventHandler, FC, useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import TextareaAutosize from 'react-textarea-autosize';
 import { toast } from 'react-toastify';
 import { getStorage, listAll, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { useDropzone } from 'react-dropzone';
@@ -24,30 +23,8 @@ import CollobaratorsContainer from './components/CollobaratorsContainer';
 import { useRouter } from 'next/dist/client/router';
 import { useSelector } from 'react-redux';
 import { getUser } from '../../store/modules/App/selectors';
-
-const TitleInput = styled(Input)`
-  width: calc(100% - 0.96em);
-`;
-
-const TextArea = styled(TextareaAutosize)`
-  margin-bottom: 16px;
-  width: calc(100% - 0.96em);
-  resize: none;
-  outline: none;
-  font-size: 1.42em;
-  padding: 0.4em 0.4em;
-  color: ${({ theme: { text } }) => text};
-  background: transparent;
-  border:1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()}};
-  caret-color: ${({ theme: { primary } }) => primary};
-  border-radius: 8px; 
-  &:hover{
-    border-color: ${({ theme: { text } }) => text};
-  }
-  &:focus {
-    border-color: ${({ theme: { primary } }) => primary};
-  }
-`;
+import TitleInput from './components/TitleInput';
+import TextArea from './components/TextArea';
 
 const AddPostButton = styled(Button)``;
 const DialogContentContainer = styled.div`

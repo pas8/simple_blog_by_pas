@@ -8,12 +8,14 @@ export const initialState: AppInitialStateType = {
     text: '#fff',
     primary: '#FFEA00'
   },
-  user: null
+  user: null,
+  messageMenuProperties: null
 };
 
 export const AppReducer = (state = initialState, action: AppActionTypes): AppInitialStateType => {
   switch (action.type) {
     case TypeNames.HANDLE_CHANGE_USER:
+    case TypeNames.HANDLE_CHANGE_MESSAGE_MENU_PROPERTIES:
     case TypeNames.HANDLE_CHANGE_THEME_PROPERTYIES: {
       return { ...state, ...action.payload };
     }
