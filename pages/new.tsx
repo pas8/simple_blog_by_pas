@@ -10,11 +10,11 @@ import { db } from '../src/layouts/FirebaseLayout';
 
 const New = () => {
   const nullityState = { [InputsNames.TITLE]: '', [InputsNames.TEXT]: '', bg_image: '', collaborators: [] as string[] };
+  const user = useSelector(getUser);
 
   const [state, setState] = useState(nullityState);
   const { push } = useRouter();
-  const user = useSelector(getUser);
-  
+
   const handleAddNewPost = async () => {
     if (!state.bg_image || !state[InputsNames.TITLE])
       return toast('You should add photo and title altghouth.', {
@@ -28,7 +28,7 @@ const New = () => {
         created: Date.now(),
         likes: [],
         comments: [],
-        by: { name: user?.displayName || user?.email, id: user?.uid }
+        by: user?.uid
       });
       if (!id) return;
       toast('New posts was successfully added', { type: 'success', theme: 'colored', position: 'bottom-right' });
@@ -40,7 +40,14 @@ const New = () => {
     }
   };
 
-  return <CreatingPostPart onClickOfSubmitButton={handleAddNewPost} state={state} setState={setState} />;
+  return (
+    <CreatingPostPart
+      onClickOfSubmitButton={handleAddNewPost}
+      state={state}
+      setState={setState}
+      maintainer={user?.uid || ''}
+    />
+  );
 };
 
 export default New;

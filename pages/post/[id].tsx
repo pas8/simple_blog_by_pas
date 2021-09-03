@@ -9,7 +9,7 @@ import { PostType } from '../../src/models/types';
 const PostPage: FC<{ post: PostType }> = ({ post }) => {
   return (
     <CenteredContainerWithBackButton>
-      <Post {...post}/>
+      <Post {...post} />
     </CenteredContainerWithBackButton>
   );
 };
@@ -20,8 +20,9 @@ export const getServerSideProps = async (context: any) => {
   const docRef = doc(db, 'posts', id);
   const docSnap = await getDoc(docRef);
   if (!docSnap.exists()) return { props: { redirect: '/' } };
+
   return {
-    props: { post: docSnap.data() }
+    props: { post: { ...docSnap.data(), id } }
   };
 };
 

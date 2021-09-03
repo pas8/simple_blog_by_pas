@@ -47,7 +47,7 @@ export const getServerSideProps = async (context: any) => {
   const profileUser = await getDoc(profileDoc);
 
   const posts: PostType[] = [];
-  const q = query(collection(db, 'posts'), where('by.id', '==', id));
+  const q = query(collection(db, 'posts'), where('maintainer', '==', id));
 
   const querySnapshot = await getDocs(q);
 

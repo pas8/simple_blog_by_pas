@@ -13,13 +13,21 @@ import Link from 'next/link';
 
 import { getUser } from '../../store/modules/App/selectors';
 import Caption from '../Caption';
+import SearchLabel from '../CreatingPostPart/components/SearchLabel';
+import CollobaratorsContainer from '../CreatingPostPart/components/CollobaratorsContainer';
 
 const PostContainer = styled.div`
   border-radius: 8px;
   padding:0.42em;
+
+ 
+
   & .editIconButton{
     display:none;
   }
+
+ 
+
   border:1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()}};
   & .commentContainer{
     position:relative;
@@ -54,11 +62,38 @@ const PostContainer = styled.div`
 
     };
     &:hover{
+& .maintainerContainer{
+ & span > div{ 
+  
+  border-color:${({ theme: { background } }) => colord(background).alpha(0.42).toHex()};
+&:hover{
+cursor:pointer;
+
+  background: ${({ theme: { background } }) => background};
+  color: ${({ theme: { primary } }) => primary};}
+}
+
+}
+
+& .postCollobaratorsContainer{
+
+    
+
+    & span > div:hover {
+      cursor:pointer;
+        border-color:${({ theme: { background } }) => `${background}`}
+    }
+
+  & span > div {
+      border-color:${({ theme: { background } }) => colord(background).alpha(0.42).toHex()}
+  }
+
+};
       & a {
 
       color: ${({ theme: { background } }) => background};
         
-      }
+      };
       & .editIconButton{
         display:block;
       }
@@ -82,6 +117,7 @@ const PostTitle = styled.h4`
   overflow: hidden;
   text-overflow: ellipsis;
   margin: 0 0 0 0;
+  padding-right:32px;
   user-select: none;
   & a {
     text-decoration: none;
@@ -110,6 +146,7 @@ const PostTitle = styled.h4`
 const PostUtilsContainer = styled.div`
   display: flex;
   gap: 10px;
+  align-items: center;
   margin: 8px 0;
 
   & p {
@@ -166,14 +203,15 @@ const TextLink = styled(Text)`
     text-decoration: underline;
   }
 `;
-
+const MaintainerContainer = styled.div``;
 const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
   Title: title,
   Text: text,
   created,
   id,
   bg_image,
-  by,
+  maintainer,
+  collaborators = [],
   likes = [],
   comments = [],
   isPreviewMode = false
@@ -229,26 +267,34 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
     }
     setState(state => ({ ...state, isWritingComment: false, commentValue: '' }));
   };
+  const handleMoveToEditPage = () => {
+    if (!collaborators.includes(user?.uid || '_') && user?.uid !== maintainer )
+      return toast('You dont have acess for editing', {
+        type: 'error',
+        theme: 'colored',
+        position: 'bottom-right'
+      });
+    push(`/edit/${id}`);
+  };
+
   return (
     <PostContainer key={`${title}_${text}_${created}`}>
       <PostTitle>
         <Link href={`/post/${id}`}>
           <a> {title} </a>
         </Link>
-        {/* {user?.uid === by.id && ( */}
-        <svg viewBox="0 0 24 24" className={'editIconButton'} onClick={() => push(`/edit/${id}`)}>
+        <svg viewBox="0 0 24 24" className={'editIconButton'} onClick={handleMoveToEditPage}>
           <path
             fill={'currentcolor'}
             d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z"
           ></path>
         </svg>
-        {/* )} */}
       </PostTitle>
       <ImgContainer onDoubleClick={handleChangeLikedStatus}>
         <Img src={bg_image} />
         <DateContainer className={'dateContainer'}> {new Date(created).toLocaleString()}</DateContainer>
       </ImgContainer>
-      <TextPost>{isPreviewMode && text.length > 292 ? `${text.slice(0,292)}...` : text}</TextPost>
+      <TextPost>{isPreviewMode && text.length > 292 ? `${text.slice(0, 292)}...` : text}</TextPost>
       <PostUtilsContainer>
         {[
           {
@@ -283,8 +329,20 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
             </svg>
           </Fragment>
         ))}
-        <TextLink onClick={() => push(`/profile/${by.id}`)}> {`$_${by.name}`} </TextLink>
+        <MaintainerContainer className={'maintainerContainer'}>
+          <span onClick={() => push(`/profile/${maintainer}`)}>
+            <SearchLabel id={maintainer} />
+          </span>
+        </MaintainerContainer>
       </PostUtilsContainer>
+
+      <CollobaratorsContainer className={'postCollobaratorsContainer'}>
+        {collaborators.map(id => (
+          <span key={id} onClick={() => push(`/profile/${id}`)}>
+            <SearchLabel id={id} />
+          </span>
+        ))}
+      </CollobaratorsContainer>
       <CommentContainer>
         {comments.map(({ name, value }) => {
           return <li key={name}>{`${name}    |   ${value}`}</li>;

@@ -1,4 +1,4 @@
-import { ChangeEventHandler, FC, useCallback, useRef, useState } from 'react';
+import { ChangeEventHandler, FC, useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import TextareaAutosize from 'react-textarea-autosize';
 import { toast } from 'react-toastify';
@@ -20,6 +20,10 @@ import Text from '../Text';
 import { collection, getDocs, query, startAt, where, orderBy, endAt } from 'firebase/firestore';
 import { db } from '../../layouts/FirebaseLayout';
 import SearchLabel from './components/SearchLabel';
+import CollobaratorsContainer from './components/CollobaratorsContainer';
+import { useRouter } from 'next/dist/client/router';
+import { useSelector } from 'react-redux';
+import { getUser } from '../../store/modules/App/selectors';
 
 const TitleInput = styled(Input)`
   width: calc(100% - 0.96em);
@@ -59,7 +63,7 @@ const DialogContentContainer = styled.div`
 
 const ImgPreview = styled.img`
   border-radius: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   width: 100%;
 `;
 const DragPlaceholder = styled.div`
@@ -73,8 +77,9 @@ const DragPlaceholder = styled.div`
   background: ${({ theme: { primary } }) => colord(primary).alpha(0.16).toHex()};
 `;
 
-const T = styled(Title)`
+const PageTitle = styled(Title)`
   padding-right: 60px;
+  margin-bottom: 10px;
 `;
 const UtilsContainer = styled.div`
   display: flex;
@@ -110,20 +115,21 @@ const SearchContainer = styled.div`
     }
   }
 `;
-const CollobaratorsContainer = styled.div`
-   gap: 8px;
-margin-bottom:10px;
-display:flex;
-`
 
 const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
   submitButtonText = 'Add New Post',
   onClickOfSubmitButton,
   setState,
+  maintainer,
   state,
   children,
   title = 'Create new post'
 }) => {
+  const { push } = useRouter();
+  const user = useSelector(getUser);
+  useEffect(() => {
+    if (!maintainer) push('/');
+  }, []);
   const titleRef = useRef<HTMLDivElement>() as any;
   const [isSearchingDialogOpen, setIsSearchingDialogOpen] = useState(false);
 
@@ -154,7 +160,7 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
   };
 
   const [queryUsers, setQueryUsers] = useState<ProfileType[]>([] as ProfileType[]);
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [selectedUsers, setSelectedUsers] = useState<string[]>(state.collaborators);
   const [searchValue, setSearchValue] = useState('');
   const on: ChangeEventHandler<HTMLInputElement> = async ({ target: { value } }) => {
     setSearchValue(value);
@@ -175,7 +181,7 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
     setState(state => ({ ...state, collaborators: selectedUsers }));
     setQueryUsers([]);
     setSearchValue('');
-    setIsSearchingDialogOpen(false)
+    setIsSearchingDialogOpen(false);
   };
   return (
     <>
@@ -184,7 +190,7 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
         title={'Add collobarators'}
         contentChildren={
           <DialogContentContainer>
-            <TitleInput onChange={on} value={searchValue} placeholder={'*start search with @ or $'} />
+            <TitleInput onChange={on} value={searchValue} placeholder={'*start search with @ or $'} autoFocus />
             <div className={'containerOfSearchLabel'}>
               {selectedUsers.map(id => (
                 <SearchLabel key={id} id={id} />
@@ -194,16 +200,24 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
             {!!queryUsers.length && (
               <SearchContainer>
                 {[...queryUsers].map(({ displayName, email, photoURL, id }, idx) => {
-                  const isSelected = selectedUsers.includes(id);
+                  const isMaintainer = id === maintainer;
+                  const isSelected = selectedUsers.includes(id) || isMaintainer;
+                  const onClick = () => {
+                    isMaintainer
+                      ? toast('You can`t delete maintainer!', {
+                          type: 'info',
+                          theme: 'colored',
+                          position: 'bottom-right'
+                        })
+                      : setSelectedUsers(state =>
+                          state.includes(id) ? state.filter(elId => elId !== id) : [...state, id]
+                        );
+                  };
                   return (
                     <div
                       className={`searchItemContainer ${isSelected && 'selected'}`}
                       key={email + idx}
-                      onClick={() =>
-                        setSelectedUsers(state =>
-                          state.includes(id) ? state.filter(elId => elId !== id) : [...state, id]
-                        )
-                      }
+                      onClick={onClick}
                     >
                       <img src={photoURL} width={24} height={24} />{' '}
                       <span>{searchValue.startsWith('$') ? `$${displayName}` : `${email}`} </span>
@@ -228,7 +242,7 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
           <DragPlaceholder isDragActive={isDragActive}></DragPlaceholder>
         }
         <div>
-          <T ref={titleRef}>
+          <PageTitle ref={titleRef}>
             {title}
             <div {...getRootProps()}>
               <IconButton
@@ -237,12 +251,12 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
               ></IconButton>
               <input {...getInputProps()} />
             </div>
-          </T>
+          </PageTitle>
           <div style={{ width: titleRef?.current?.offsetWidth }}>
             {!!state.bg_image && <ImgPreview src={state.bg_image} />}{' '}
           </div>
           <CollobaratorsContainer>
-            {state.collaborators.map(id => (
+            {(maintainer !== user?.uid ? [maintainer, ...state.collaborators] : state.collaborators).map(id => (
               <SearchLabel key={id} id={id} />
             ))}
           </CollobaratorsContainer>
