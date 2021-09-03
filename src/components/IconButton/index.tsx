@@ -7,6 +7,8 @@ const Button = styled.svg`
   padding: 0.4rem;
   border-radius: 50%;
   border: 1px solid ${({ theme: { text } }) => text};
+  background: ${({ theme: { background } }) => background};
+  z-index:100000;
   &:hover {
     border-color: ${({ theme: { primary } }) => primary};
     & path {
