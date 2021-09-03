@@ -14,7 +14,7 @@ const New = () => {
 
   const [state, setState] = useState(nullityState);
   const { push } = useRouter();
-
+  if (!user?.uid) push('/');
   const handleAddNewPost = async () => {
     if (!state.bg_image || !state[InputsNames.TITLE])
       return toast('You should add photo and title altghouth.', {
@@ -28,7 +28,7 @@ const New = () => {
         created: Date.now(),
         likes: [],
         comments: [],
-        by: user?.uid
+        maintainer: user?.uid
       });
       if (!id) return;
       toast('New posts was successfully added', { type: 'success', theme: 'colored', position: 'bottom-right' });
