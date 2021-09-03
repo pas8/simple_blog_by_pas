@@ -1,53 +1,12 @@
-import {
-  collection,
-  query,
-  where,
-  orderBy,
-  getDocs,
-  limit,
-  addDoc,
-  onSnapshot,
-  deleteDoc,
-  doc,
-  updateDoc
-} from 'firebase/firestore';
-import CenteredContainerWithBackButton from '../../src/components/CenteredContainerWithBackButton';
+import { collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../../src/layouts/FirebaseLayout';
-import { useCollectionData, useCollection } from 'react-firebase-hooks/firestore';
-import { useEffect, useState } from 'react';
-import TitleInput from '../../src/components/CreatingPostPart/components/TitleInput';
-import IconButton from '../../src/components/IconButton';
+import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUser } from '../../src/store/modules/App/selectors';
-import Text from '../../src/components/Text';
-import styled from 'styled-components';
 import { MessageType } from '../../src/models/types';
-import MessageItem from '../../src/components/MessageItem';
-import dynamic from 'next/dynamic';
-import ChatMessageMenu from '../../src/components/ChatMessageMenu';
 import { toast } from 'react-toastify';
-import { uniq, uniqBy } from 'lodash';
-import TextArea from '../../src/components/CreatingPostPart/components/TextArea';
-
-const InputContainer = styled.div`
-  position: relative;
-
-  & textarea {
-    padding-right: 56px;
-  }
-  & svg {
-    border: 0px;
-  }
-`;
-
-const MessagesContainer = styled.div`
-  display: flex;
-
-  width: calc(100% + 42px);
-  margin-bottom: 10px;
-  flex-direction: column;
-  gap: 8px;
-`;
+import ChatMainPart from '../../src/components/ChatMainPart';
+import Title from '../../src/components/Title';
 
 const Chat = () => {
   const user = useSelector(getUser);
@@ -112,25 +71,15 @@ const Chat = () => {
   };
   return (
     <>
-      <ChatMessageMenu handleDeleteMessage={handleDeleteMessage} handleUpdateMessage={handleUpdateMessage} />
-      <CenteredContainerWithBackButton>
-        <div style={{  marginLeft:'-42px'}}>
-        <MessagesContainer>
-          {!!messages?.length &&
-            uniqBy(messages, 'id')
-              .sort((a, b) => a.created - b.created)
-              ?.map(el => <MessageItem {...el} isSelfMessage={el.by === user?.id} key={el.id} />)}
-        </MessagesContainer>
-        <InputContainer>
-          <TextArea value={messageValue} onChange={({ target: { value } }) => setMessageValue(value)} />
-          <IconButton
-            d={'M2.01 21L23 12 2.01 3 2 10l15 2-15 2z'}
-            dimensions={{ bottom: 18, right: -48 }}
-            onClick={handleAddMessage}
-          />
-        </InputContainer>
-        </div>
-      </CenteredContainerWithBackButton>
+      <ChatMainPart
+    title={'Group chat'}
+        messages={messages}
+        handleAddMessage={handleAddMessage}
+        handleDeleteMessage={handleDeleteMessage}
+        handleUpdateMessage={handleUpdateMessage}
+        messageValue={messageValue}
+        setMessageValue={setMessageValue}
+      />
     </>
   );
 };

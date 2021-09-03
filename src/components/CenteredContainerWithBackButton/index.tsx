@@ -19,8 +19,9 @@ const CenteredContainerWithBackButton: FC = ({ children }) => {
     <Wrapper>
       <IconButton
         onClick={back}
+        position={'fixed'}
         d={'M20,11V13H8L13.5,18.5L12.08,19.92L4.16,12L12.08,4.08L13.5,5.5L8,11H20Z'}
-        dimensions={{ top: 16, left: 0 }}
+        dimensions={{ top: 16 }}
       />
       <div> {children} </div>
     </Wrapper>

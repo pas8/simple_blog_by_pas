@@ -4,6 +4,7 @@ import { FC, MutableRefObject, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { HexColorPicker } from 'react-colorful';
 import styled from 'styled-components';
+
 import CenteredContainerWithBackButton from '../../src/components/CenteredContainerWithBackButton';
 import PostMasonry from '../../src/components/PostMasonry';
 import Title from '../../src/components/Title';
@@ -20,7 +21,6 @@ import { toChangeThemePropertyies } from '../../src/store/modules/App/actions';
 import { colord } from 'colord';
 import { toast } from 'react-toastify';
 import Subtitle from '../../src/components/Subtitle';
-
 const ProfileContainer = dynamic(() => import('../../src/components/ProfileContainer'), { ssr: false });
 
 const Img = styled.img`
@@ -51,6 +51,8 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
   const themePropertyies = useSelector(getThemePropertyies);
   const [maintheme, setMainTheme] = useState<ThemeType>(themePropertyies);
   const user = useSelector(getUser);
+  const { push } = useRouter();
+
   useEffect(() => {
     dispatch(
       toChangeThemePropertyies({
@@ -108,15 +110,19 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
       />
 
       <CenteredContainerWithBackButton>
-        {user?.id === profileUser.id && (
-          <SvgContainer>
-            <IconButton
-              onClick={() => setIsThemeDialogOpen(true)}
-              position={'relative'}
-              d="M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.04 10 9c0 3.31-2.69 6-6 6h-1.77c-.28 0-.5.22-.5.5 0 .12.05.23.13.33.41.47.64 1.06.64 1.67 0 1.38-1.12 2.5-2.5 2.5zm0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8c.28 0 .5-.22.5-.5 0-.16-.08-.28-.14-.35-.41-.46-.63-1.05-.63-1.65 0-1.38 1.12-2.5 2.5-2.5H16c2.21 0 4-1.79 4-4 0-3.86-3.59-7-8-7z"
-            />
-          </SvgContainer>
-        )}
+        <SvgContainer>
+          <IconButton
+            onClick={() =>
+              user?.id === profileUser.id ? setIsThemeDialogOpen(true) : push(`/messages/${user?.id}/${profileUser.id}`)
+            }
+            position={'relative'}
+            d={
+              user?.id === profileUser.id
+                ? 'M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.04 10 9c0 3.31-2.69 6-6 6h-1.77c-.28 0-.5.22-.5.5 0 .12.05.23.13.33.41.47.64 1.06.64 1.67 0 1.38-1.12 2.5-2.5 2.5zm0-18c-4.41 0-8 3.59-8 8s3.59 8 8 8c.28 0 .5-.22.5-.5 0-.16-.08-.28-.14-.35-.41-.46-.63-1.05-.63-1.65 0-1.38 1.12-2.5 2.5-2.5H16c2.21 0 4-1.79 4-4 0-3.86-3.59-7-8-7z'
+                : 'M20 17.17L18.83 16H4V4h16v13.17zM20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2z'
+            }
+          />
+        </SvgContainer>
         <ProfileContainer>
           <Title>
             <TitleWrapper>

@@ -68,9 +68,9 @@ const PostContainer = styled.div`
   border-color:${({ theme: { background } }) => colord(background).alpha(0.42).toHex()};
 &:hover{
 cursor:pointer;
+background:${({ theme: { background } }) => colord(background).alpha(0.16).toHex()};
 
-  background: ${({ theme: { background } }) => background};
-  color: ${({ theme: { primary } }) => primary};}
+}
 }
 
 }
@@ -81,7 +81,8 @@ cursor:pointer;
 
     & span > div:hover {
       cursor:pointer;
-        border-color:${({ theme: { background } }) => `${background}`}
+      background:${({ theme: { background } }) => colord(background).alpha(0.16).toHex()};
+        border-color:${({ theme: { background } }) => `${background}`};
     }
 
   & span > div {

@@ -1,23 +1,33 @@
 import { colord } from 'colord';
-import { collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { useRouter } from 'next/dist/client/router';
 import { FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {} from 'react-textarea-autosize';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { useFindUser } from '../../hooks/useFindUser.hook';
 import { db } from '../../layouts/FirebaseLayout';
+import { ChatMessageMenuPropsType } from '../../models/types';
 import { toChangeMessageMenuProperties } from '../../store/modules/App/actions';
 import { getMessageMenuProperties } from '../../store/modules/App/selectors';
+import SearchLabel from '../CreatingPostPart/components/SearchLabel';
 import TextArea from '../CreatingPostPart/components/TextArea';
-import Input from '../Input';
-import MessageItem from '../MessageItem';
 import Text from '../Text';
 
 const ChatMessageMenuContainer = styled.div`
   position: absolute;
   width: min-content;
   padding: 8px;
+  & .searchLabelContainer {
+    &:hover {
+      background: ${({ theme: { text } }) => colord(text).alpha(0.16).toHex()};
+      cursor: pointer;
+    }
+    width: 93%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: 6px;
+  }
   border-radius: 8px;
   background: ${({ theme: { background } }) => background};
   z-index: 10;
@@ -57,28 +67,23 @@ const DateContainer = styled(UtilsContainer)`
 
 const MessgePreviewContainer = styled.div`
   position: relative;
-  & img {
-    width: 26px;
-    top: 6px;
-    left: 6px;
-    border-radius: 50px;
-    position: absolute;
-  }
+
   & textarea {
     margin: 0;
-    padding-left: 36px;
-    width: calc(100% - 46px);
+    width: calc(100% - 10%);
   }
 `;
 
-const ChatMessageMenu: FC<{
-  handleDeleteMessage: (id: string) => void;
-  handleUpdateMessage: (id: string, value: string) => void;
-}> = ({ handleDeleteMessage, handleUpdateMessage }) => {
+const ChatMessageMenu: FC<ChatMessageMenuPropsType> = ({
+  handleDeleteMessage,
+  handleUpdateMessage,
+  isPrivateMode = false
+}) => {
   const messageMenuProperties = useSelector(getMessageMenuProperties);
-  const user = useFindUser(messageMenuProperties?.by || '');
   const [messageValue, setMessageValue] = useState(messageMenuProperties?.value || '');
   const dispatch = useDispatch();
+  const { push } = useRouter();
+  const handleCloseMenu = () => dispatch(toChangeMessageMenuProperties({ messageMenuProperties: null }));
 
   useEffect(() => {
     setMessageValue(messageMenuProperties?.value || '');
@@ -89,8 +94,7 @@ const ChatMessageMenu: FC<{
 
   if (!messageMenuProperties) return <></>;
   const { x, y, ...messageProps } = messageMenuProperties;
-  const handleCloseMenu = () => dispatch(toChangeMessageMenuProperties({ messageMenuProperties: null }));
-
+  const notPrivateUtils = !messageMenuProperties.isSelfMessage ? ['Save'] : [];
   const menuUtilsArr = [
     {
       d: 'M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z',
@@ -147,8 +151,17 @@ const ChatMessageMenu: FC<{
 
   return (
     <ChatMessageMenuContainer style={{ top: y, left: x }}>
+      <span
+        onClick={() => {
+      handleCloseMenu()
+
+          push(`profile/${messageMenuProperties?.by}`);
+        }}
+      >
+        <SearchLabel id={messageMenuProperties?.by || ''} />
+      </span>
+
       <MessgePreviewContainer>
-        <img src={user?.photoURL} />{' '}
         <TextArea
           value={messageValue}
           onChange={({ target: { value } }) =>
@@ -161,16 +174,18 @@ const ChatMessageMenu: FC<{
       </MessgePreviewContainer>
       <DateContainer>{new Date(messageProps?.created).toLocaleString()}</DateContainer>
       <UtilsContainer>
-        {menuUtilsArr.map(({ d, caption, onClick }) => {
-          return (
-            <MenuItemContainer key={d} onClick={onClick}>
-              <svg viewBox={'0 0 24 24'}>
-                <path d={d} fill={'currentcolor'} />
-              </svg>
-              <Text>{caption}</Text>
-            </MenuItemContainer>
-          );
-        })}
+        {menuUtilsArr
+          .filter(({ caption }) => !notPrivateUtils.includes(caption))
+          .map(({ d, caption, onClick }) => {
+            return (
+              <MenuItemContainer key={d} onClick={onClick}>
+                <svg viewBox={'0 0 24 24'}>
+                  <path d={d} fill={'currentcolor'} />
+                </svg>
+                <Text>{caption}</Text>
+              </MenuItemContainer>
+            );
+          })}
       </UtilsContainer>
     </ChatMessageMenuContainer>
   );
