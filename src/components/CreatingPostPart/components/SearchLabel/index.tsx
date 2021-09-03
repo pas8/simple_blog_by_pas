@@ -24,11 +24,12 @@ const SearchLabel: FC<{ id: string }> = ({ id }) => {
     const handleSetProfileData = async () => {
       const profileDoc = doc(db, 'users', id);
       const profileUser = await getDoc(profileDoc);
-      setUserProfileData(profileUser.data() as ProfileDocType)
+      setUserProfileData(profileUser.data() as ProfileDocType);
     };
-    handleSetProfileData()
+    handleSetProfileData();
   }, [id]);
-
+  if (!userProfileData) return <></>;
+  
   return (
     <SearchLabelContainer>
       <img src={userProfileData?.photoURL || ''} width={24} height={24} />

@@ -18,7 +18,7 @@ const EditPostPage: FC<{ post: PostType }> = ({ post }) => {
     [InputsNames.TITLE]: post.Title,
     [InputsNames.TEXT]: post.Text,
     bg_image: post.bg_image,
-    collaborators: post.collaborators
+    collaborators: post?.collaborators || []
   };
 
   const [state, setState] = useState(nullityState);
@@ -97,6 +97,7 @@ const EditPostPage: FC<{ post: PostType }> = ({ post }) => {
       <CreatingPostPart
         onClickOfSubmitButton={handleChangePost}
         state={state}
+        maintainer={post.maintainer}
         setState={setState}
         title={'Edit post'}
         submitButtonText={'Save changes'}

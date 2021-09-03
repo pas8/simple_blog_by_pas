@@ -15,7 +15,7 @@ export type PostType = {
   created: number;
   id: string;
   bg_image: string;
-  by: { id: string; name: string };
+  maintainer: string;
   likes: string[];
   collaborators: string[];
   comments: { by: string; value: string; name: string }[];
@@ -29,6 +29,7 @@ export type StateOfCreatingPostPartPropsType = { [Propety in InputsNames | 'bg_i
 export type CreatingPostPartPropsType = {
   submitButtonText?: string;
   onClickOfSubmitButton: () => void;
+  maintainer: string;
   title?: string;
   state: StateOfCreatingPostPartPropsType;
   setState: Dispatch<SetStateAction<StateOfCreatingPostPartPropsType>>;
