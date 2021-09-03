@@ -253,7 +253,7 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
             {!!state.bg_image && <ImgPreview src={state.bg_image} />}{' '}
           </div>
           <CollobaratorsContainer>
-            {(maintainer !== user?.uid ? [maintainer, ...state.collaborators] : state.collaborators).map(id => (
+            {(maintainer !== user?.id ? [maintainer, ...state.collaborators] : state.collaborators).map(id => (
               <SearchLabel key={id} id={id} />
             ))}
           </CollobaratorsContainer>

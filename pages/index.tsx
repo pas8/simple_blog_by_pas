@@ -1,5 +1,5 @@
 import { colord } from 'colord';
-import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, setDoc, updateDoc } from 'firebase/firestore';
 import { useRouter } from 'next/dist/client/router';
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -91,16 +91,32 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
   const theme = useSelector(getThemePropertyies);
   const dispatch = useDispatch();
 
-  const handleChangeTheme = () => {
-    const themePropertyies = mapValues(theme, el => colord(el).invert().toHex());
-    dispatch(toChangeThemePropertyies({ themePropertyies }));
+  const handleChangeTheme = async () => {
+    if (!user) return;
+    const isThemeDark = !colord(theme.background).isDark();
+
+    try {
+      const ref = doc(db, 'users', user.id);
+
+      await updateDoc(ref, {
+        isThemeDark
+      });
+      dispatch(
+        toChangeThemePropertyies({
+          themePropertyies: { ...mapValues(theme, el => colord(el).invert().toHex()), primary: theme.primary }
+        })
+      );
+    } catch (error) {
+      console.log(error);
+      toast('Something went wrong, try again ', {
+        type: 'error',
+        theme: 'colored',
+        position: 'bottom-right'
+      });
+    }
   };
-  const isThemeDark = colord(theme.background).isDark();
 
   const auth = getAuth();
-  onAuthStateChanged(auth, User => {
-    dispatch(toChangeUser({ user: User }));
-  });
 
   const handleAuthorisate = async () => {
     const provider = new GoogleAuthProvider();
@@ -111,6 +127,8 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
 
       const f = await setDoc(doc(db, 'users', uid), {
         photoURL,
+        isThemeDark: true,
+        primaryColor: '#FFEA00',
         displayName,
         email
       });
@@ -128,6 +146,7 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
       });
     }
   };
+  const isThemeDark = colord(theme.background).isDark();
 
   return (
     <>
@@ -149,11 +168,14 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
             ) : (
               <>
                 <IconButton
-                  onClick={() => signOut(auth)}
+                  onClick={() => {
+                    dispatch(toChangeUser({ user: null }));
+                    signOut(auth);
+                  }}
                   position={'relative'}
                   d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
                 />
-                <UserPhoto src={user?.photoURL || ''} onClick={() => push(`profile/${user?.uid}`)} />
+                <UserPhoto src={user?.photoURL || ''} onClick={() => push(`profile/${user?.id}`)} />
               </>
             )}
           </HeaderUtilsContainer>

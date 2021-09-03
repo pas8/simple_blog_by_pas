@@ -222,17 +222,17 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
   const [state, setState] = useState({
     commentValue: '',
     isWritingComment: false,
-    isLiked: likes.includes(user?.uid || '')
+    isLiked: likes.includes(user?.id || '')
   });
 
   useEffect(() => {
-    setState(state => ({ ...state, isLiked: likes.includes(user?.uid || '') }));
+    setState(state => ({ ...state, isLiked: likes.includes(user?.id || '') }));
   }, [likes, user]);
 
   const handleChangeLikedStatus = async () => {
     const ref = doc(db, 'posts', id);
     await updateDoc(ref, {
-      likes: likes?.includes(user?.uid || '') ? likes.filter(id => user?.uid !== id) : [...likes, user?.uid]
+      likes: likes?.includes(user?.id || '') ? likes.filter(id => user?.id !== id) : [...likes, user?.id]
     });
     setState(state => ({ ...state, isLiked: !state.isLiked }));
   };
@@ -251,7 +251,7 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
     const ref = doc(db, 'posts', id);
     try {
       await updateDoc(ref, {
-        comments: [...comments, { by: user?.uid, value: state.commentValue, name: user?.displayName || user?.email }]
+        comments: [...comments, { by: user?.id, value: state.commentValue, name: user?.displayName || user?.email }]
       });
       toast('U successfully added a comment)', {
         type: 'success',
@@ -268,7 +268,7 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
     setState(state => ({ ...state, isWritingComment: false, commentValue: '' }));
   };
   const handleMoveToEditPage = () => {
-    if (!collaborators.includes(user?.uid || '_') && user?.uid !== maintainer )
+    if (!collaborators.includes(user?.id || '_') && user?.id !== maintainer )
       return toast('You dont have acess for editing', {
         type: 'error',
         theme: 'colored',
