@@ -24,10 +24,9 @@ import CollobaratorsContainer from './components/CollobaratorsContainer';
 import { useRouter } from 'next/dist/client/router';
 import { useSelector } from 'react-redux';
 import { getUser } from '../../store/modules/App/selectors';
+import TitleInput from './components/TitleInput';
 
-const TitleInput = styled(Input)`
-  width: calc(100% - 0.96em);
-`;
+
 
 const TextArea = styled(TextareaAutosize)`
   margin-bottom: 16px;

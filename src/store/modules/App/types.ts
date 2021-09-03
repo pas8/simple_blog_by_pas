@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import { ThemeType, ProfileType } from './../../../models/types';
+import { ThemeType, ProfileType, MessageType } from './../../../models/types';
 import { $Values, Optional } from 'utility-types';
 import { TypeNames } from './enums';
 
@@ -10,9 +10,16 @@ export type PayloadTypes = {
   [TypeNames.HANDLE_CHANGE_USER]: {
     user: ProfileType | null;
   };
+  [TypeNames.HANDLE_CHANGE_MESSAGE_MENU_PROPERTIES]: {
+    messageMenuProperties: MessageMenuPropertiesType | null;
+  };
 };
 
 export type ActionsValueTypes = {
+  toChangeMessageMenuProperties: {
+    type: typeof TypeNames.HANDLE_CHANGE_MESSAGE_MENU_PROPERTIES;
+    payload: PayloadTypes[TypeNames.HANDLE_CHANGE_MESSAGE_MENU_PROPERTIES];
+  };
   toChangeThemePropertyies: {
     type: typeof TypeNames.HANDLE_CHANGE_THEME_PROPERTYIES;
     payload: PayloadTypes[TypeNames.HANDLE_CHANGE_THEME_PROPERTYIES];
@@ -23,8 +30,13 @@ export type ActionsValueTypes = {
   };
 };
 export type AppActionTypes = $Values<ActionsValueTypes>;
+export type MessageMenuPropertiesType = MessageType &
+  {
+    [Property in 'x' | 'y']: number;
+  } & { isSelfMessage: boolean };
 
 export type AppInitialStateType = {
   themePropertyies: ThemeType;
   user: ProfileType | null;
+  messageMenuProperties: MessageMenuPropertiesType | null;
 };

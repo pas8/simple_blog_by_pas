@@ -14,7 +14,7 @@ const New = () => {
 
   const [state, setState] = useState(nullityState);
   const { push } = useRouter();
- 
+
   const handleAddNewPost = async () => {
     if (!state.bg_image || !state[InputsNames.TITLE])
       return toast('You should add photo and title altghouth.', {
