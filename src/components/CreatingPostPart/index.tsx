@@ -127,9 +127,6 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
 }) => {
   const { push } = useRouter();
   const user = useSelector(getUser);
-  useEffect(() => {
-    if (!maintainer) push('/');
-  }, []);
   const titleRef = useRef<HTMLDivElement>() as any;
   const [isSearchingDialogOpen, setIsSearchingDialogOpen] = useState(false);
 
