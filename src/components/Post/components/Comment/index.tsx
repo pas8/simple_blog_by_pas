@@ -1,16 +1,18 @@
 import { colord } from 'colord';
-import { FC, useEffect } from 'react';
+import { FC, MouseEventHandler, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { useFindUser } from '../../../../hooks/useFindUser.hook';
 import { CommentType } from '../../../../models/types';
+import { toChangeCommentMenuProperties } from '../../../../store/modules/App/actions';
 import Text from '../../../Text';
 
 const CommentContainer = styled.div`
   display: flex;
   width: max-content;
-  align-items:center;
+  align-items: center;
   border-bottom: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.16).toHex()};
-width:100%;
+  width: 100%;
   padding: 4px;
   & p {
     word-break: break-word;
@@ -23,17 +25,23 @@ width:100%;
     background: ${({ theme: { background } }) => colord(background).alpha(0.16).toHex()};
   }
   & img {
-    margin-left:2px;
+    margin-left: 2px;
     border-radius: 50%;
     margin-right: 8px;
   }
 `;
 
-const Comment: FC<CommentType> = ({ id, by, created, isEdited, value }) => {
+const Comment: FC<CommentType & { isSelfComment: boolean; postId: string }> = messageProps => {
+  const { id, by, created, isEdited, value } = messageProps;
   const user = useFindUser(by);
+  const dispatch = useDispatch();
 
+  const onClick: MouseEventHandler = ({ currentTarget }) => {
+    const { x, y } = currentTarget.getBoundingClientRect();
+    dispatch(toChangeCommentMenuProperties({ commentMenuProperties: { ...messageProps, x, y } }));
+  };
   return (
-    <CommentContainer>
+    <CommentContainer onClick={onClick} className={'commentItemContainer'}>
       <img src={user?.photoURL || ''} width={20} height={20} />
       <Text> {value} </Text>
       {isEdited && (

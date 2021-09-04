@@ -56,6 +56,7 @@ export type ChatMessageMenuPropsType = {
   handleUpdateMessage: (id: string, value: string) => void;
 };
 
+
 export type ChatMainPartPropsType = {
   messages: MessageType[];
   title?: string;

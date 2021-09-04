@@ -19,6 +19,7 @@ import Button from '../src/components/Button';
 import dynamic from 'next/dynamic';
 import PostMasonry from '../src/components/PostMasonry';
 import UserPhoto from '../src/components/UserPhoto';
+import CommentMenu from '../src/components/CommentMenu';
 
 const MainTitle = dynamic(() => import('../src/components/MainTitle'), { ssr: false });
 
@@ -149,6 +150,7 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
 
   return (
     <>
+      <CommentMenu />
       <Container>
         <Title>
           <MainTitle />

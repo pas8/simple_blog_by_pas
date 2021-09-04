@@ -34,7 +34,6 @@ const MessageDefaultContainer = styled(MessageContainer)`
   }
   &:hover {
     background: ${({ theme: { text } }) => colord(text).alpha(0.16).toHex()};
-
   }
   border: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
 `;
@@ -47,7 +46,7 @@ const MessageSelfContainer = styled(MessageContainer)`
   &:hover {
     background: ${({ theme: { background, primary } }) => {
       extend([mixPlugin]);
-      return colord(background).alpha(0.16).mix(primary,0.8).toHex();
+      return colord(background).alpha(0.16).mix(primary, 0.8).toHex();
     }};
   }
   background: ${({ theme: { primary } }) => primary};
@@ -63,7 +62,7 @@ const MessageItem: FC<MessageType & { isSelfMessage: boolean }> = ({ isSelfMessa
 
   const Container = isSelfMessage ? MessageSelfContainer : MessageDefaultContainer;
   const onClick: MouseEventHandler = ({ currentTarget }) => {
-    const { x, y, height, width } = currentTarget.getBoundingClientRect();
+    const { x, y } = currentTarget.getBoundingClientRect();
     dispatch(toChangeMessageMenuProperties({ messageMenuProperties: { ...messageProps, x, y, isSelfMessage } }));
   };
   return (

@@ -19,3 +19,12 @@ export const toChangeMessageMenuProperties = (
   type: TypeNames.HANDLE_CHANGE_MESSAGE_MENU_PROPERTIES,
   payload
 });
+
+
+export const toChangeCommentMenuProperties = (
+  payload: PayloadTypes[TypeNames.HANDLE_CHANGE_COMMENT_MENU_PROPERTIES]
+): AppActionTypes => ({
+  type: TypeNames.HANDLE_CHANGE_COMMENT_MENU_PROPERTIES,
+  payload
+});
+
