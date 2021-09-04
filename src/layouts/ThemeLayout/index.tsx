@@ -8,7 +8,7 @@ import { device } from '../../models/denotation';
 import { toChangeThemePropertyies } from '../../store/modules/App/actions';
 import { getThemePropertyies, getUser } from '../../store/modules/App/selectors';
 
-const GlobalStyle = createGlobalStyle`body{margin:0;fontFamily;display:flex;justify-content:center;background:${({
+const GlobalStyle = createGlobalStyle`body{overflow-x:hidden;margin:0;fontFamily;display:flex;justify-content:center;background:${({
   theme: { background }
 }: any) => background};}`;
 

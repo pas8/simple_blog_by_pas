@@ -72,8 +72,12 @@ const Chat = () => {
   return (
     <>
       <ChatMainPart
-    title={'Group chat'}
+        title={'Group chat'}
         messages={messages}
+        titleURL={'/'}
+        titlePhoto={
+            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAP8AAACqCAMAAABVlWm8AAAABlBMVEUAV7f/1wDfELsCAAAAhElEQVR4nO3PMQEAAAjAIO1f2hRegwbMAAAAAAAAAAAAAAAAAAAAAAAAAAAAPNk2/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv+2A+BhVKwOtdkDAAAAAElFTkSuQmCC'
+        }
         handleAddMessage={handleAddMessage}
         handleDeleteMessage={handleDeleteMessage}
         handleUpdateMessage={handleUpdateMessage}
