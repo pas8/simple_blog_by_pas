@@ -12,7 +12,6 @@ import { db } from '../../src/layouts/FirebaseLayout';
 import { PostType, ProfileDocType, ThemeType } from '../../src/models/types';
 import { getThemePropertyies, getUser } from '../../src/store/modules/App/selectors';
 
-import dynamic from 'next/dynamic';
 import IconButton from '../../src/components/IconButton';
 import Dialog from '../../src/components/Dialog';
 import CloseButton from '../../src/components/CloseButton';
@@ -21,6 +20,8 @@ import { toChangeThemePropertyies } from '../../src/store/modules/App/actions';
 import { colord } from 'colord';
 import { toast } from 'react-toastify';
 import Subtitle from '../../src/components/Subtitle';
+
+import dynamic from 'next/dynamic';
 const ProfileContainer = dynamic(() => import('../../src/components/ProfileContainer'), { ssr: false });
 
 const Img = styled.img`

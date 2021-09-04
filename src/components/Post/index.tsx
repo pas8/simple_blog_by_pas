@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import Text from '../Text';
 import { db } from '../../layouts/FirebaseLayout';
-import { PostType } from '../../models/types';
+import { CommentType, PostType } from '../../models/types';
 import { useRouter } from 'next/dist/client/router';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
@@ -15,23 +15,21 @@ import { getUser } from '../../store/modules/App/selectors';
 import Caption from '../Caption';
 import SearchLabel from '../CreatingPostPart/components/SearchLabel';
 import CollobaratorsContainer from '../CreatingPostPart/components/CollobaratorsContainer';
+import Comment from './components/Comment';
 
 const PostContainer = styled.div`
   border-radius: 8px;
   padding:0.42em;
-
- 
-
   & .editIconButton{
     display:none;
   }
 
- 
 
   border:1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()}};
   & .commentContainer{
     position:relative;
     margin-top:8px;
+
     & .iconButtonWhichAddingNewComment{
       position:absolute;
       bottom:0px;
@@ -40,7 +38,6 @@ const PostContainer = styled.div`
       padding:4px;
       border:2px solid transparent;
       background: ${({ theme: { background } }) => background};
-
       &:hover{
         cursor:pointer;
         border-color: ${({ theme: { background } }) => background}
@@ -58,51 +55,54 @@ const PostContainer = styled.div`
     }}
     & textarea, a {
       color: ${({ theme: { text } }) => text};
-
-
     };
     &:hover{
-& .maintainerContainer{
- & span > div{ 
-  
-  border-color:${({ theme: { background } }) => colord(background).alpha(0.42).toHex()};
+      & .commentsContainer {
+        & > div {
+
+        border-color:${({ theme: { background } }) => colord(background).alpha(0.16).toHex()};
+
+        }
 &:hover{
-cursor:pointer;
-background:${({ theme: { background } }) => colord(background).alpha(0.16).toHex()};
+  border-color:${({ theme: { background } }) => background};
 
 }
-}
+        border-color:${({ theme: { background } }) => colord(background).alpha(0.42).toHex()};
 
-}
-
-& .postCollobaratorsContainer{
-
-    
-
-    & span > div:hover {
-      cursor:pointer;
-      background:${({ theme: { background } }) => colord(background).alpha(0.16).toHex()};
+  
+      }
+      & .maintainerContainer{
+        & span > div{ 
+          border-color:${({ theme: { background } }) => colord(background).alpha(0.42).toHex()};
+          &:hover{
+            cursor:pointer;
+            background:${({ theme: { background } }) => colord(background).alpha(0.16).toHex()};
+          }
+        }
+      }
+    & .postCollobaratorsContainer{
+      & span > div:hover {
+        cursor:pointer;
+        background:${({ theme: { background } }) => colord(background).alpha(0.16).toHex()};
         border-color:${({ theme: { background } }) => `${background}`};
     }
-
-  & span > div {
+        & span > div {
       border-color:${({ theme: { background } }) => colord(background).alpha(0.42).toHex()}
-  }
-
-};
+      }
+    };
       & a {
-
       color: ${({ theme: { background } }) => background};
-        
       };
       & .editIconButton{
         display:block;
       }
+
       & .commentContainer{
       & .iconButtonWhichAddingNewComment{ background: ${({ theme: { primary } }) => primary};}
       & textarea {
       color: ${({ theme: { background } }) => background};
-    }}
+      }
+    }
     & .dateContainer{
       background: ${({ theme: { primary } }) => primary};
       color: ${({ theme: { background } }) => background};
@@ -114,7 +114,7 @@ background:${({ theme: { background } }) => colord(background).alpha(0.16).toHex
 `;
 const PostTitle = styled.h4`
   font-size: 2.42rem;
-  word-break: break-all;
+  word-break: break-word;
   position: relative;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -168,19 +168,14 @@ const Img = styled.img`
   border-radius: 8px;
 `;
 
-const CommentContainer = styled.ul`
-  margin-block-start: 0em;
-  margin-block-end: 0.32em;
-  padding-inline-start: 22px;
-  list-style-type: '$   ';
-  & li {
-    margin-bottom: 4px;
-    font-size: 0.8rem;
-  }
+const CommentContainer = styled.div`
+  border: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
+  border-radius: 8px;
+  overflow: hidden;
 `;
 const TextPost = styled(Text)`
   margin: 10px 0;
-  word-break: break-all;
+  word-break: break-word;
 `;
 const DateContainer = styled(Caption)`
   padding: 4px 6px;
@@ -216,9 +211,21 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
   maintainer,
   collaborators = [],
   likes = [],
-  comments = [],
   isPreviewMode = false
 }) => {
+  const [comments, setComments] = useState<CommentType[]>([]);
+  useEffect(() => {
+    const uploadComments = async () => {
+      const commentsCollection = collection(db, `posts/${id}/comments`);
+      const commentsSnap = await getDocs(commentsCollection);
+      let commentsArr: CommentType[] = [];
+      commentsSnap.forEach(doc => commentsArr.push({ ...doc.data(), id: doc.id } as CommentType));
+      setComments(commentsArr);
+    };
+
+    uploadComments();
+  }, [id]);
+
   const { push } = useRouter();
   const user = useSelector(getUser);
   const isAuth = !!user;
@@ -251,10 +258,13 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
         theme: 'colored',
         position: 'bottom-right'
       });
-    const ref = doc(db, 'posts', id);
+
     try {
-      await updateDoc(ref, {
-        comments: [...comments, { by: user?.id, value: state.commentValue, name: user?.displayName || user?.email }]
+      await addDoc(collection(db, `posts/${id}/comments`), {
+        by: user?.id,
+        value: state.commentValue,
+        created: Date.now(),
+        isEdited: false
       });
       toast('U successfully added a comment)', {
         type: 'success',
@@ -271,7 +281,7 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
     setState(state => ({ ...state, isWritingComment: false, commentValue: '' }));
   };
   const handleMoveToEditPage = () => {
-    if (!collaborators.includes(user?.id || '_') && user?.id !== maintainer )
+    if (!collaborators.includes(user?.id || '_') && user?.id !== maintainer)
       return toast('You dont have acess for editing', {
         type: 'error',
         theme: 'colored',
@@ -339,18 +349,22 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
         </MaintainerContainer>
       </PostUtilsContainer>
 
-      <CollobaratorsContainer className={'postCollobaratorsContainer'}>
-        {collaborators.map(id => (
-          <span key={id} onClick={() => push(`/profile/${id}`)}>
-            <SearchLabel id={id} />
-          </span>
-        ))}
-      </CollobaratorsContainer>
-      <CommentContainer>
-        {comments.map(({ name, value }) => {
-          return <li key={name}>{`${name}    |   ${value}`}</li>;
-        })}
-      </CommentContainer>
+      {!!collaborators.length && (
+        <CollobaratorsContainer className={'postCollobaratorsContainer'}>
+          {collaborators.map(id => (
+            <span key={id} onClick={() => push(`/profile/${id}`)}>
+              <SearchLabel id={id} />
+            </span>
+          ))}
+        </CollobaratorsContainer>
+      )}
+      {!!comments.length && (
+        <CommentContainer className={'commentsContainer'}>
+          {comments.map(({ ...props }) => {
+            return <Comment key={props.id} {...props} />;
+          })}
+        </CommentContainer>
+      )}
       {state.isWritingComment && (
         <div className={'commentContainer'}>
           <TextareaAutosize
