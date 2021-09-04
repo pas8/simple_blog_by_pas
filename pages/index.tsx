@@ -1,5 +1,5 @@
 import { colord } from 'colord';
-import { collection, doc, getDocs, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore';
 import { useRouter } from 'next/dist/client/router';
 import { FC } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -111,17 +111,26 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
   const handleAuthorisate = async () => {
     const provider = new GoogleAuthProvider();
 
-    try {
-      const { user } = await signInWithPopup(auth, provider);
-      const { uid, photoURL, displayName, email } = user;
+    const { user } = await signInWithPopup(auth, provider);
+    const { uid, photoURL, displayName, email } = user;
+    const docRef = doc(db, 'users', uid);
 
-      const f = await setDoc(doc(db, 'users', uid), {
-        photoURL,
-        isThemeDark: true,
-        primaryColor: '#FFEA00',
-        displayName,
-        email
-      });
+    const docSnap = await getDoc(docRef);
+
+    try {
+      if (!docSnap.exists()) {
+        const f = await setDoc(doc(db, 'users', uid), {
+          photoURL,
+          gitHubURL: '',
+          websiteURL: '',
+          crowns: [],
+          description: '',
+          isThemeDark: true,
+          primaryColor: '#FFEA00',
+          displayName,
+          email
+        });
+      }
       toast('Successfully log in!', {
         type: 'success',
         theme: 'colored',

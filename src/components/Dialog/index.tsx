@@ -28,7 +28,7 @@ const DialogContainer = styled.div`
   position: fixed;
   display: grid;
   place-items: center;
-  z-index: 1000;
+  z-index: 1000000;
   inset: 0;
   background: ${({ theme: { background } }) => colord(background).alpha(0.8).toHex()};
 `;
