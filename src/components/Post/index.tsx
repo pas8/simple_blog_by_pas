@@ -114,6 +114,7 @@ background:${({ theme: { background } }) => colord(background).alpha(0.16).toHex
 `;
 const PostTitle = styled.h4`
   font-size: 2.42rem;
+  word-break: break-all;
   position: relative;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -179,6 +180,7 @@ const CommentContainer = styled.ul`
 `;
 const TextPost = styled(Text)`
   margin: 10px 0;
+  word-break: break-all;
 `;
 const DateContainer = styled(Caption)`
   padding: 4px 6px;

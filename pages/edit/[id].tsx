@@ -31,8 +31,20 @@ const EditPostPage: FC<{ post: PostType }> = ({ post }) => {
 
   const handleChangePost = async () => {
     // if (!every(values(state), el => !!el))
+    if (state[InputsNames.TEXT].length > 2000)
+      return toast('Max lenght of text is 2000 letters', {
+        type: 'error',
+        theme: 'colored',
+        position: 'bottom-right'
+      });
+    if (state[InputsNames.TITLE].length > 200)
+      return toast('Max lenght of title is 200 letters', {
+        type: 'error',
+        theme: 'colored',
+        position: 'bottom-right'
+      });
     if (!state.bg_image || !state[InputsNames.TITLE])
-      return toast('You should add photo altghouth.', {
+      return toast('You should add photo and title altghouth.', {
         type: 'error',
         theme: 'colored',
         position: 'bottom-right'

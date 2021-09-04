@@ -35,8 +35,8 @@ const TitleWrapper = styled.div`
 `;
 const SvgContainer = styled.div`
   position: absolute;
+  right:0;
   top: 16px;
-  right: 0;
 `;
 const DialogContentContainer = styled.div`
   & .react-colorful {
@@ -131,7 +131,7 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
           </Title>
         </ProfileContainer>
 
-        {!!posts.length ? <PostMasonry posts={posts} /> : <Subtitle>No posts was created by this user :(</Subtitle>}
+        {!!posts.length ? <PostMasonry posts={posts} isPreviewMode/> : <Subtitle>No posts was created by this user :(</Subtitle>}
       </CenteredContainerWithBackButton>
     </>
   );
