@@ -33,7 +33,6 @@ const MessagesPage: FC<{ id: string }> = ({ id }) => {
     )
       .mix(user?.primaryColor || themePropertyies.primary)
       .toHex();
-    console.log(user?.primaryColor, primary);
     dispatch(
       toChangeThemePropertyies({
         themePropertyies: {

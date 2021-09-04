@@ -9,8 +9,9 @@ const SearchLabelContainer = styled.div`
   border-radius: 8px;
   display: flex;
   border: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
-  width: max-content;
   padding: 4px;
+  word-break: break-word;
+  align-items: center;
   & img {
     border-radius: 50%;
     margin-right: 8px;
@@ -33,7 +34,7 @@ const SearchLabel: FC<{ id: string }> = ({ id }) => {
   return (
     <SearchLabelContainer className={'searchLabelContainer'}>
       <img src={userProfileData?.photoURL || ''} width={24} height={24} />
-      {`$${userProfileData?.displayName}` || userProfileData?.email}{' '}
+      {`$${userProfileData?.displayName}` || userProfileData?.email}
     </SearchLabelContainer>
   );
 };

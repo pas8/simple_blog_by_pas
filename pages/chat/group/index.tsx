@@ -1,14 +1,13 @@
 import { collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc } from 'firebase/firestore';
-import { db } from '../../src/layouts/FirebaseLayout';
+import { db } from '../../../src/layouts/FirebaseLayout';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { getUser } from '../../src/store/modules/App/selectors';
-import { MessageType } from '../../src/models/types';
+import { getUser } from '../../../src/store/modules/App/selectors';
+import { MessageType } from '../../../src/models/types';
 import { toast } from 'react-toastify';
-import ChatMainPart from '../../src/components/ChatMainPart';
-import Title from '../../src/components/Title';
+import ChatMainPart from '../../../src/components/ChatMainPart';
 
-const Chat = () => {
+const GroupChat = () => {
   const user = useSelector(getUser);
   const messageCollection = collection(db, 'messages');
 
@@ -88,4 +87,4 @@ const Chat = () => {
   );
 };
 
-export default Chat;
+export default GroupChat;
