@@ -73,8 +73,6 @@ const HeaderUtilsContainer = styled.div`
   gap: 10px;
 `;
 
-
-
 const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
   const { push } = useRouter();
   const user = useSelector(getUser);
@@ -162,7 +160,7 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
               <>
                 <IconButton
                   onClick={() => {
-                    push('/chat/group');
+                    push(`/chat/${user?.id}`);
                   }}
                   position={'relative'}
                   d="M20 17.17L18.83 16H4V4h16v13.17zM20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2z"

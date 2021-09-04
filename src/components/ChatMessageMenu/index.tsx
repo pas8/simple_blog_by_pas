@@ -94,7 +94,7 @@ const ChatMessageMenu: FC<ChatMessageMenuPropsType> = ({
 
   if (!messageMenuProperties) return <></>;
   const { x, y, ...messageProps } = messageMenuProperties;
-  const notPrivateUtils = !messageMenuProperties.isSelfMessage ? ['Save'] : [];
+  const notPrivateUtils = isPrivateMode && !messageMenuProperties.isSelfMessage ? ['Save', 'Delete'] : !messageMenuProperties.isSelfMessage ? ['Save'] : [];
   const menuUtilsArr = [
     {
       d: 'M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z',
@@ -153,9 +153,9 @@ const ChatMessageMenu: FC<ChatMessageMenuPropsType> = ({
     <ChatMessageMenuContainer style={{ top: y, left: x }}>
       <span
         onClick={() => {
-      handleCloseMenu()
+          handleCloseMenu();
 
-          push(`profile/${messageMenuProperties?.by}`);
+          push(`/profile/${messageMenuProperties?.by}`);
         }}
       >
         <SearchLabel id={messageMenuProperties?.by || ''} />

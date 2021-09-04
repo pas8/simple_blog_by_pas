@@ -131,7 +131,6 @@ const MessagesPage: FC<{ id: string }> = ({ id }) => {
       <ChatMainPart
         messages={messages}
         titleURL={`/profile/${id[1]}`}
-        isPrivateMode
         titlePhoto={companion?.photoURL}
         title={companion?.displayName}
         handleAddMessage={handleAddMessage}

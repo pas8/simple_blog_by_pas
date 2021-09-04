@@ -11,7 +11,7 @@ const CommentContainer = styled.div`
   align-items:center;
   border-bottom: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.16).toHex()};
 width:100%;
-  padding: 2px;
+  padding: 4px;
   & p {
     word-break: break-word;
   }

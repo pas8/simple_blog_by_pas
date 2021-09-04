@@ -21,7 +21,7 @@ export type PostType = {
 };
 // comments: CommentType[];
 
-export type CommentType = { by: string; value: string; created: string; isEdited: boolean; id: string;  }
+export type CommentType = { by: string; value: string; created: number; isEdited: boolean; id: string;  }
 export type PostItemStateType = { [key: string]: { [Property in 'isLiked' | 'isWritingComment']: boolean } };
 export type StateOfCreatingPostPartPropsType = { [Propety in InputsNames | 'bg_image']: string } & {
   collaborators: string[];
