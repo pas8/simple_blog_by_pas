@@ -16,8 +16,8 @@ const New = () => {
   const { push } = useRouter();
 
   const handleAddNewPost = async () => {
-    if (state[InputsNames.TEXT].length > 2000)
-      return toast('Max lenght of text is 2000 letters', {
+    if (state[InputsNames.TEXT].length > 8000)
+      return toast('Max lenght of text is 8000 letters', {
         type: 'error',
         theme: 'colored',
         position: 'bottom-right'
