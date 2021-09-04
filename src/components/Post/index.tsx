@@ -11,7 +11,7 @@ import { useRouter } from 'next/dist/client/router';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 
-import { getUser } from '../../store/modules/App/selectors';
+import { getCommentMenuProperties, getUser } from '../../store/modules/App/selectors';
 import Caption from '../Caption';
 import SearchLabel from '../CreatingPostPart/components/SearchLabel';
 import CollobaratorsContainer from '../CreatingPostPart/components/CollobaratorsContainer';
@@ -57,6 +57,10 @@ const PostContainer = styled.div`
       color: ${({ theme: { text } }) => text};
     };
     &:hover{
+      & .commentItemContainer path {
+
+        fill:${({ theme: { background } }) => colord(background).alpha(0.42).toHex()};
+      }
       & .commentsContainer {
         & > div {
 
@@ -202,6 +206,8 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
   isPreviewMode = false
 }) => {
   const [comments, setComments] = useState<CommentType[]>([]);
+  const commentMenuProperties = useSelector(getCommentMenuProperties);
+
   useEffect(() => {
     const uploadComments = async () => {
       const commentsCollection = collection(db, `posts/${id}/comments`);
@@ -212,7 +218,7 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
     };
 
     uploadComments();
-  }, [id]);
+  }, [id, commentMenuProperties]);
 
   const { push } = useRouter();
   const user = useSelector(getUser);
@@ -350,7 +356,7 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
           {comments
             .sort((a, b) => a.created - b.created)
             .map(({ ...props }) => {
-              return <Comment key={props.id} {...props} />;
+              return <Comment key={props.id} {...props} isSelfComment={user?.id === props.by} postId={id} />;
             })}
         </CommentContainer>
       )}

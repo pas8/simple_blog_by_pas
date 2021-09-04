@@ -2,15 +2,19 @@ import { doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/dist/client/router';
 import { FC, useRef } from 'react';
 import CenteredContainerWithBackButton from '../../src/components/CenteredContainerWithBackButton';
+import CommentMenu from '../../src/components/CommentMenu';
 import Post from '../../src/components/Post';
 import { db } from '../../src/layouts/FirebaseLayout';
 import { PostType } from '../../src/models/types';
 
 const PostPage: FC<{ post: PostType }> = ({ post }) => {
   return (
-    <CenteredContainerWithBackButton>
-      <Post {...post} />
-    </CenteredContainerWithBackButton>
+    <>
+      <CommentMenu />
+      <CenteredContainerWithBackButton>
+        <Post {...post} />
+      </CenteredContainerWithBackButton>
+    </>
   );
 };
 

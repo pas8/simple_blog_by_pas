@@ -28,6 +28,7 @@ import Input from '../../src/components/Input';
 import { capitalize } from 'lodash';
 import Link from 'next/link';
 import Button from '../../src/components/Button';
+import CommentMenu from '../../src/components/CommentMenu';
 
 const ProfileContainer = dynamic(() => import('../../src/components/ProfileContainer'), { ssr: false });
 
@@ -101,7 +102,7 @@ const CrownPreviewContainer = styled.div`
   font-size: 1rem;
   border: 1px solid;
   &:hover {
-    border-color:${({
+    border-color: ${({
       theme: { text, primary },
       //@ts-ignore
       isCrownWasGiven
@@ -193,6 +194,7 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
 
   return (
     <>
+      <CommentMenu />
       <Dialog
         isOpen={isThemeDialogOpen}
         title={'Change theme color'}
