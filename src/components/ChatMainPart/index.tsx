@@ -92,10 +92,14 @@ const ChatMainPart: FC<ChatMainPartPropsType> = ({
 
             <InputContainer>
               <ProfileContainer>
-                <TextArea value={messageValue} onChange={({ target: { value } }) => setMessageValue(value)} />
+                <TextArea
+                  value={messageValue}
+                  onChange={({ target: { value } }) => setMessageValue(value)}
+                  placeholder={'Write something...'}
+                />
                 <IconButton
                   d={'M2.01 21L23 12 2.01 3 2 10l15 2-15 2z'}
-                  dimensions={{ bottom: 24, right: 0 }}
+                  dimensions={{ bottom: 23, right: 0 }}
                   onClick={handleAddMessage}
                 />
               </ProfileContainer>

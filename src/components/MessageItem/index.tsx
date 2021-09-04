@@ -1,13 +1,12 @@
-import { colord } from 'colord';
-import { doc, getDoc } from 'firebase/firestore';
-import { FC, MouseEventHandler, useEffect, useRef, useState } from 'react';
+import { colord, extend } from 'colord';
+import { FC, MouseEventHandler } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { useFindUser } from '../../hooks/useFindUser.hook';
-import { db } from '../../layouts/FirebaseLayout';
-import { MessageType, ProfileType } from '../../models/types';
+import { MessageType } from '../../models/types';
 import { toChangeMessageMenuProperties } from '../../store/modules/App/actions';
 import Text from '../Text';
+import mixPlugin from 'colord/plugins/mix';
 
 const MessageContainer = styled.div`
   border-radius: 8px;
@@ -33,6 +32,10 @@ const MessageDefaultContainer = styled(MessageContainer)`
   & path {
     fill: ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
   }
+  &:hover {
+    background: ${({ theme: { text } }) => colord(text).alpha(0.16).toHex()};
+
+  }
   border: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
 `;
 
@@ -40,6 +43,12 @@ const MessageSelfContainer = styled(MessageContainer)`
   align-self: flex-end;
   & path {
     fill: ${({ theme: { background } }) => colord(background).alpha(0.42).toHex()};
+  }
+  &:hover {
+    background: ${({ theme: { background, primary } }) => {
+      extend([mixPlugin]);
+      return colord(background).alpha(0.16).mix(primary,0.8).toHex();
+    }};
   }
   background: ${({ theme: { primary } }) => primary};
 

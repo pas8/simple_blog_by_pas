@@ -194,13 +194,7 @@ const ImgContainer = styled.div`
   position: relative;
   cursor: pointer;
 `;
-const TextLink = styled(Text)`
-  &:hover {
-    cursor: pointer;
-    color: ${({ theme: { background } }) => background};
-    text-decoration: underline;
-  }
-`;
+
 const MaintainerContainer = styled.div``;
 const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
   Title: title,
@@ -360,7 +354,7 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
       )}
       {!!comments.length && (
         <CommentContainer className={'commentsContainer'}>
-          {comments.map(({ ...props }) => {
+          {comments.sort((a,b)=> a.created - b.created).map(({ ...props }) => {
             return <Comment key={props.id} {...props} />;
           })}
         </CommentContainer>
