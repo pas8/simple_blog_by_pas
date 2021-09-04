@@ -8,7 +8,17 @@ import { device } from '../../models/denotation';
 import { toChangeThemePropertyies } from '../../store/modules/App/actions';
 import { getThemePropertyies, getUser } from '../../store/modules/App/selectors';
 
-const GlobalStyle = createGlobalStyle`body{overflow-x:hidden;margin:0;fontFamily;display:flex;justify-content:center;background:${({
+const GlobalStyle = createGlobalStyle`*{
+  word-break: break-word;
+
+};
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+body{overflow-x:hidden;margin:0;fontFamily;display:flex;justify-content:center;background:${({
   theme: { background }
 }: any) => background};}`;
 
@@ -18,7 +28,6 @@ const ThemeLayout: FC = ({ children }) => {
   const dispatch = useDispatch();
   useEffect(() => {
     if (!user) return;
-
 
     const themePropertyies = user.isThemeDark ? theme : mapValues(theme, el => colord(el).invert().toHex());
     dispatch(toChangeThemePropertyies({ themePropertyies: { ...themePropertyies, primary: user.primaryColor } }));

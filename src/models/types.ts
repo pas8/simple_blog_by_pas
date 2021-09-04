@@ -21,7 +21,7 @@ export type PostType = {
 };
 // comments: CommentType[];
 
-export type CommentType = { by: string; value: string; created: number; isEdited: boolean; id: string;  }
+export type CommentType = { by: string; value: string; created: number; isEdited: boolean; id: string };
 export type PostItemStateType = { [key: string]: { [Property in 'isLiked' | 'isWritingComment']: boolean } };
 export type StateOfCreatingPostPartPropsType = { [Propety in InputsNames | 'bg_image']: string } & {
   collaborators: string[];
@@ -41,6 +41,10 @@ export type ProfileDocType = {
 } & {
   primaryColor: string;
   isThemeDark: boolean;
+  description: string;
+  crowns: string[];
+  websiteURL: string;
+  gitHubURL: string;
 };
 
 export type ProfileType = ProfileDocType & { id: string };
@@ -55,7 +59,7 @@ export type ChatMessageMenuPropsType = {
 export type ChatMainPartPropsType = {
   messages: MessageType[];
   title?: string;
-  titleURL?:string;
+  titleURL?: string;
   titlePhoto?: string;
 
   handleAddMessage: () => void;

@@ -13,6 +13,7 @@
     "@types/styled-components": "^5.1.13",
     "axios": "^0.21.1",
     "colord": "^2.7.0",
+    "compress.js": "^1.1.2",
     "firebase": "^9.0.1",
     "lodash": "^4.17.21",
     "next": "11.1.2",

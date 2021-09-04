@@ -1339,6 +1339,11 @@ commondir@^1.0.1:
   resolved "https://registry.yarnpkg.com/commondir/-/commondir-1.0.1.tgz#ddd800da0c66127393cca5950ea968a3aaf1253b"
   integrity sha1-3dgA2gxmEnOTzKWVDqloo6rxJTs=
 
+compress.js@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/compress.js/-/compress.js-1.1.2.tgz#2c19528a017b7d500673f2df69e66b04074d1464"
+  integrity sha512-92bBngXANtmZpyBqO7E5nQMt6TOJtso8FO5fEx85WeF2t/CDAxs8K+KSu8EuLGMZWWMOdxvFf/bsXG7rOPmAyw==
+
 concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
@@ -3320,11 +3325,6 @@ react-dropzone@^11.3.4:
     attr-accept "^2.2.1"
     file-selector "^0.2.2"
     prop-types "^15.7.2"
-
-react-firebase-hooks@^3.0.4:
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/react-firebase-hooks/-/react-firebase-hooks-3.0.4.tgz#2185357d2bd6f7292552bc65f2459bbf9364e673"
-  integrity sha512-eqhj8O5t/9nzGS/DfCGQX9goqbxTP2T/qrY2B13s4rx/VIJ4Bx3WnZgqxEVA0Y/mWZBh7gOlXSPdRGbxBq5d8g==
 
 react-is@17.0.2:
   version "17.0.2"

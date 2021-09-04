@@ -20,8 +20,9 @@ const EditPostPage: FC<{ post: PostType }> = ({ post }) => {
     bg_image: post.bg_image,
     collaborators: post?.collaborators || []
   };
-
   const [state, setState] = useState(nullityState);
+console.log(state.bg_image)
+
   const {
     push,
     query: { id }

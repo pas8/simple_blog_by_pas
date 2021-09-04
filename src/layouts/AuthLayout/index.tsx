@@ -10,11 +10,11 @@ import { db } from '../FirebaseLayout';
 const AuthLayout: FC = ({ children }) => {
   const dispatch = useDispatch();
   const auth = getAuth();
+  const {pathname} = useRouter()
   const [id, setId] = useState('');
   onAuthStateChanged(auth, user => {
     setId(user?.uid || '');
   });
-  const { push } = useRouter();
 
   useEffect(() => {
     if (!id) return;
@@ -25,7 +25,7 @@ const AuthLayout: FC = ({ children }) => {
       dispatch(toChangeUser({ user: { ...profileUser.data(), id } as ProfileType }));
     };
     handleUploadUser();
-  }, [id]);
+  }, [id,pathname]);
   return <>{children}</>;
 };
 

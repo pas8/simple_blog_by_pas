@@ -121,12 +121,6 @@ const PostTitle = styled.h4`
   margin: 0 0 0 0;
   padding-right:32px;
   user-select: none;
-  & a {
-    text-decoration: none;
-  }
-  & a:hover {
-    text-decoration: underline;
-  }
   & .editIconButton {
     position: absolute;
     width: 1.6rem;
@@ -283,7 +277,6 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
       });
     push(`/edit/${id}`);
   };
-
   return (
     <PostContainer key={`${title}_${text}_${created}`}>
       <PostTitle>
@@ -354,9 +347,11 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
       )}
       {!!comments.length && (
         <CommentContainer className={'commentsContainer'}>
-          {comments.sort((a,b)=> a.created - b.created).map(({ ...props }) => {
-            return <Comment key={props.id} {...props} />;
-          })}
+          {comments
+            .sort((a, b) => a.created - b.created)
+            .map(({ ...props }) => {
+              return <Comment key={props.id} {...props} />;
+            })}
         </CommentContainer>
       )}
       {state.isWritingComment && (
