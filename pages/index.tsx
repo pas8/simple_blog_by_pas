@@ -226,8 +226,7 @@ export const getServerSideProps = async () => {
   kickedUsersSnap.forEach(async doc => {
     kickedUsersArr.push(doc.id);
   });
-
-  const q = query(collection(db, 'posts'), where('maintainer', 'not-in', kickedUsersArr));
+  const q = query(collection(db, 'posts'), where('maintainer', 'not-in',  !!kickedUsersArr.length ? kickedUsersArr : [{maintainer:''}]));
 
   const querySnapshot = await getDocs(q);
 

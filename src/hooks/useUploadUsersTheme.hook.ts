@@ -5,14 +5,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useState } from 'react';
 import { colord } from 'colord';
 import { ThemeType } from '../models/types';
+import { useValidateColor } from './useValidateColor.hook';
 
 export const useUploadUsersTheme = (profileUser: ProfileType | null) => {
-
   const themePropertyies = useSelector(getThemePropertyies);
   const [maintheme, setMainTheme] = useState<ThemeType>(themePropertyies);
 
   const dispatch = useDispatch();
-
+  const primary = useValidateColor(profileUser?.primaryColor || '');
   useEffect(() => {
     if (!profileUser) return;
 
@@ -20,15 +20,12 @@ export const useUploadUsersTheme = (profileUser: ProfileType | null) => {
       toChangeThemePropertyies({
         themePropertyies: {
           ...themePropertyies,
-          primary:
-            colord(themePropertyies.background).isDark() && colord(profileUser.primaryColor).isDark()
-              ? colord(profileUser.primaryColor).invert().toHex()
-              : profileUser.primaryColor
+          primary
         }
       })
     );
     return () => {
       dispatch(toChangeThemePropertyies({ themePropertyies: maintheme }));
     };
-  }, [profileUser]);
+  }, [profileUser, primary]);
 };

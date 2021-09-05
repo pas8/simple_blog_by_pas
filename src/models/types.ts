@@ -78,6 +78,7 @@ export type KickedUserType = {
   when: number;
   by: string;
   id: string;
+  justification:string;
   reason: string;
-  isAskedForRestoring: boolean;
+    
 };
