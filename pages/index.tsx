@@ -12,7 +12,7 @@ import { toChangeThemePropertyies, toChangeUser } from '../src/store/modules/App
 import { getThemePropertyies, getUser } from '../src/store/modules/App/selectors';
 import Container from '../src/components/Container';
 import Title from '../src/components/Title';
-import { PostType } from '../src/models/types';
+import { PostType, RankVariants } from '../src/models/types';
 import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { toast } from 'react-toastify';
 import Button from '../src/components/Button';
@@ -130,7 +130,7 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
           photoURL,
           gitHubURL: '',
           websiteURL: '',
-          rank: 'hastati',
+          rank: RankVariants.HASTATI,
           crowns: [],
           description: '',
           isThemeDark: true,

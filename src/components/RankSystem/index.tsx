@@ -15,7 +15,7 @@ const RankSystemContainer = styled.div`
   border: 1px solid;
   width: 100%;
   border-radius: 8px;
-  overflow:hidden;
+  overflow: hidden;
   border-color: ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
   & .currentRank {
     background: ${({ theme: { primary } }) => primary};
@@ -42,21 +42,29 @@ const RankSystemContainer = styled.div`
   }
 `;
 const RankOfCurrentUserContainer = styled(RankSystemContainer)`
+  border-color: ${({ color }) => color};
+
   margin-bottom: 10px;
+  & .currentRank {
+    background: ${({ color }) => color};
+    color: ${({ theme: { background } }) => background};
+  }
 `;
 const RankSystem: FC<{
   currentRank: RankVariants;
+  isSelfPage: boolean;
   setCurrentRank: Dispatch<SetStateAction<RankVariants>>;
   userPhotoURL: string;
-}> = ({ currentRank, userPhotoURL, setCurrentRank }) => {
+}> = ({ currentRank, userPhotoURL, setCurrentRank, isSelfPage }) => {
   //@ts-ignore
   const rankArr = Object.values(RankVariants).reverse();
   const rankIdx = rankArr.findIndex(el => el === currentRank);
   const user = useSelector(getUser);
   return (
     <>
-      {user && (
-        <RankOfCurrentUserContainer>
+      {user && !isSelfPage && (
+        //@ts-ignore
+        <RankOfCurrentUserContainer color={user?.primaryColor}>
           <Subtitle className={'currentRank'}>
             <div className={'content'}>
               <svg viewBox={'0 0 24 24'} width={42} height={42} className={'rankSvg'}>
@@ -83,19 +91,21 @@ const RankSystem: FC<{
                 </svg>
                 {capitalize(rankName)}
               </div>
-              {rankIdx !== idx ? (
-                <IconButton
-                  onClick={handleChangeRank}
-                  position={'relative'}
-                  d={
-                    idx > rankIdx
-                      ? 'M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z'
-                      : 'M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z'
-                  }
-                />
-              ) : (
-                <img src={userPhotoURL} />
-              )}
+              {isSelfPage && rankIdx === idx && <img src={userPhotoURL} />}
+              {!isSelfPage &&
+                (rankIdx !== idx ? (
+                  <IconButton
+                    onClick={handleChangeRank}
+                    position={'relative'}
+                    d={
+                      idx > rankIdx
+                        ? 'M11,4H13V16L18.5,10.5L19.92,11.92L12,19.84L4.08,11.92L5.5,10.5L11,16V4Z'
+                        : 'M13,20H11V8L5.5,13.5L4.08,12.08L12,4.16L19.92,12.08L18.5,13.5L13,8V20Z'
+                    }
+                  />
+                ) : (
+                  <img src={userPhotoURL} />
+                ))}
             </Subtitle>
           );
         })}

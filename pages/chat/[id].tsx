@@ -13,7 +13,7 @@ import { db } from '../../src/layouts/FirebaseLayout';
 import { FC, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUser } from '../../src/store/modules/App/selectors';
-import { MessageType } from '../../src/models/types';
+import { MessageType, RankVariants } from '../../src/models/types';
 import { toast } from 'react-toastify';
 import ChatMainPart from '../../src/components/ChatMainPart';
 import CenteredContainerWithBackButton from '../../src/components/CenteredContainerWithBackButton';
@@ -26,6 +26,7 @@ import { colord } from 'colord';
 import ChatsPreviewIem from '../../src/components/ChatsPreviewItem';
 import Subtitle from '../../src/components/Subtitle';
 import ChatsPreviewItemContainer from '../../src/components/ChatsPreviewItem/components/ChatsPreviewItemContainer';
+import { useUnLoginedUserDefender } from '../../src/hooks/useUnLoginedUserDefender.hook';
 
 const ChatsContainer = styled.div`
   border: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
@@ -34,21 +35,34 @@ const ChatsContainer = styled.div`
 `;
 
 const Chat: FC<{ id: string; uniqUsers: string[] }> = ({ id, uniqUsers }) => {
-  const user = useSelector(getUser);
+  const [condition, placeholder, user] = useUnLoginedUserDefender(id);
+  if (condition) return placeholder;
   const { push } = useRouter();
-  useEffect(() => {
-    if (user?.id !== id) push('/');
-  }, [id]);
-  if (user?.id !== id) return <></>;
-
+  const isHaveAccess = user.rank !== RankVariants.HASTATI;
+  console.log(isHaveAccess);
   return (
     <>
       <CenteredContainerWithBackButton>
         <Title>All chats</Title>
         <ChatsContainer>
           {
-            //@ts-ignore
-            <ChatsPreviewItemContainer color={user?.primaryColor} onClick={() => push('/chat/group')}>
+            <ChatsPreviewItemContainer
+              color={user?.primaryColor}
+              onClick={() =>
+                isHaveAccess
+                  ? push('/chat/group')
+                  : toast(
+                      'Your rank is so small to have access to group chat, you can raise your rank by creting posts for blog  ',
+                      {
+                        type: 'info',
+                        theme: 'colored',
+                        position: 'bottom-right'
+                      }
+                    )
+              }
+              //@ts-ignore
+              isHaveAccess={isHaveAccess}
+            >
               <img
                 src={
                   'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAP8AAACqCAMAAABVlWm8AAAABlBMVEUAV7f/1wDfELsCAAAAhElEQVR4nO3PMQEAAAjAIO1f2hRegwbMAAAAAAAAAAAAAAAAAAAAAAAAAAAAPNk2/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv+2A+BhVKwOtdkDAAAAAElFTkSuQmCC'
