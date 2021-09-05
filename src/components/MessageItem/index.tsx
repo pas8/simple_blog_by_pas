@@ -61,9 +61,13 @@ const MessageItem: FC<MessageType & { isSelfMessage: boolean }> = ({ isSelfMessa
   const dispatch = useDispatch();
 
   const Container = isSelfMessage ? MessageSelfContainer : MessageDefaultContainer;
-  const onClick: MouseEventHandler = ({ currentTarget }) => {
+  const onClick = ({ currentTarget, view }: any) => {
     const { x, y } = currentTarget.getBoundingClientRect();
-    dispatch(toChangeMessageMenuProperties({ messageMenuProperties: { ...messageProps, x, y, isSelfMessage } }));
+    const validatedX = view?.window?.innerWidth - x < 320 ? view?.window?.innerWidth - 320 : x;
+
+    dispatch(
+      toChangeMessageMenuProperties({ messageMenuProperties: { ...messageProps, x: validatedX, y, isSelfMessage } })
+    );
   };
   return (
     <>

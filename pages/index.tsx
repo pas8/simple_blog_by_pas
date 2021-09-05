@@ -1,7 +1,7 @@
 import { colord } from 'colord';
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore';
 import { useRouter } from 'next/dist/client/router';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { mapValues } from 'lodash';
 import styled from 'styled-components';
@@ -76,11 +76,17 @@ const HeaderUtilsContainer = styled.div`
 
 const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
   const { push } = useRouter();
+  const dispatch = useDispatch();
   const user = useSelector(getUser);
+  const themePropertyies = useSelector(getThemePropertyies);
+// console.log(user)
+  // useEffect(() => {
+    // dispatch(toChangeThemePropertyies({ themePropertyies: { ...themePropertyies, primary: user?.primaryColor } }));
+  // }, [user?.primaryColor]);
+
   const isAuth = !!user;
 
   const theme = useSelector(getThemePropertyies);
-  const dispatch = useDispatch();
 
   const handleChangeTheme = async () => {
     if (!user) return;
@@ -124,6 +130,7 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
           photoURL,
           gitHubURL: '',
           websiteURL: '',
+          rank: 'hastati',
           crowns: [],
           description: '',
           isThemeDark: true,

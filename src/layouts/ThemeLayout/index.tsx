@@ -31,7 +31,7 @@ const ThemeLayout: FC = ({ children }) => {
 
     const themePropertyies = user.isThemeDark ? theme : mapValues(theme, el => colord(el).invert().toHex());
     dispatch(toChangeThemePropertyies({ themePropertyies: { ...themePropertyies, primary: user.primaryColor } }));
-  }, [user]);
+  }, [user?.primaryColor]);
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />

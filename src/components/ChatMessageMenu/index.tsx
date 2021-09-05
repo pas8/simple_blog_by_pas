@@ -103,7 +103,7 @@ const ChatMessageMenu: FC<ChatMessageMenuPropsType> = ({
           push(`/profile/${messageMenuProperties?.by}`);
         }}
       >
-        <SearchLabel id={messageMenuProperties?.by || ''} />
+        <SearchLabel maxNameLength={18} id={messageMenuProperties?.by || ''} />
       </span>
 
       <MessgePreviewContainer>

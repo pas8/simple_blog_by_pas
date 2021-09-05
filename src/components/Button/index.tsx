@@ -11,6 +11,7 @@ export default styled.button`
   cursor: pointer;
   font-size: 1.16rem;
   border: 1px solid;
+  justify-content:center;
   float: right;
   color: ${({
     theme: { primary, text },

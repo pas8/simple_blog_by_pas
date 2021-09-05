@@ -4,15 +4,21 @@ import { FC, useRef } from 'react';
 import CenteredContainerWithBackButton from '../../src/components/CenteredContainerWithBackButton';
 import CommentMenu from '../../src/components/CommentMenu';
 import Post from '../../src/components/Post';
+import { useFindUser } from '../../src/hooks/useFindUser.hook';
+import { useUploadUsersTheme } from '../../src/hooks/useUploadUsersTheme.hook';
 import { db } from '../../src/layouts/FirebaseLayout';
 import { PostType } from '../../src/models/types';
 
 const PostPage: FC<{ post: PostType }> = ({ post }) => {
+  const maintainerUser = useFindUser(post.maintainer);
+  useUploadUsersTheme(maintainerUser);
   return (
     <>
       <CommentMenu />
       <CenteredContainerWithBackButton>
-        <Post {...post} />
+        <div style={{ marginTop: 16 }}>
+          <Post {...post} />
+        </div>
       </CenteredContainerWithBackButton>
     </>
   );

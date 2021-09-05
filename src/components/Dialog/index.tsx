@@ -17,7 +17,7 @@ const DialogMainContainer = styled.div`
 
 const DialogContentContainer = styled.div`
   padding: 1em;
-  transition:.4s easy all;
+  transition: 0.4s easy all;
   border: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
   border-radius: 8px;
   margin: 20px;
@@ -28,20 +28,21 @@ const DialogContainer = styled.div`
   position: fixed;
   display: grid;
   place-items: center;
-  z-index: 1000000;
+  z-index: 100;
   inset: 0;
   background: ${({ theme: { background } }) => colord(background).alpha(0.8).toHex()};
 `;
 
-const Dialog: FC<{ isOpen: boolean; utilsChildren: ReactNode; contentChildren?: ReactNode; title: string }> = ({
-  isOpen,
-  title,
-  utilsChildren,
-  contentChildren
-}) => {
+const Dialog: FC<{
+  isOpen: boolean;
+  utilsChildren: ReactNode;
+  contentChildren?: ReactNode;
+  title: string;
+  plusZIndex?: number;
+}> = ({ isOpen, title, plusZIndex = 0, utilsChildren, contentChildren }) => {
   if (!isOpen) return <></>;
   return (
-    <DialogContainer>
+    <DialogContainer style={{ zIndex: 100 + plusZIndex }}>
       <DialogContentContainer>
         <Subtitle>{title}</Subtitle>
         <DialogMainContainer>{contentChildren}</DialogMainContainer>
