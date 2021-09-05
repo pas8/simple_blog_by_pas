@@ -1,6 +1,6 @@
-import { collection, query, where, getDocs, getDoc, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/dist/client/router';
-import { ChangeEventHandler, FC,  useState } from 'react';
+import { ChangeEventHandler, FC, ReactNode, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { HexColorPicker } from 'react-colorful';
 import styled from 'styled-components';
@@ -9,7 +9,7 @@ import CenteredContainerWithBackButton from '../../src/components/CenteredContai
 import PostMasonry from '../../src/components/PostMasonry';
 import Title from '../../src/components/Title';
 import { db } from '../../src/layouts/FirebaseLayout';
-import { PostType, ProfileDocType, RankVariants} from '../../src/models/types';
+import { PostType, ProfileDocType, RankVariants } from '../../src/models/types';
 import { getThemePropertyies, getUser } from '../../src/store/modules/App/selectors';
 
 import IconButton from '../../src/components/IconButton';
@@ -30,6 +30,7 @@ import CommentMenu from '../../src/components/CommentMenu';
 import { useFindRankD } from '../../src/hooks/useFindRankD.hook';
 import RankSystem from '../../src/components/RankSystem';
 import { useUploadUsersTheme } from '../../src/hooks/useUploadUsersTheme.hook';
+import { colord } from 'colord';
 
 const ProfileContainer = dynamic(() => import('../../src/components/ProfileContainer'), { ssr: false });
 
@@ -80,6 +81,7 @@ const DescriptionTextArea = styled(TextArea)`
 const ProfilePropertiesContainer = styled.div`
   display: flex;
   flex-direction: column;
+
   gap: 10px;
   & .title {
     margin-top: -10px;
@@ -138,13 +140,65 @@ const CrownPreviewContainer = styled.div`
   align-items: center;
 `;
 
+const DescriptionGitHubWebSiteContainer = styled.div`
+  border: 1px solid;
+  border-color: ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
+  border-radius: 8px;
+  & p {
+    padding: 8px;
+    & svg {
+      border-radius: 50%;
+      margin-right: 12px;
+
+      border: 1px solid ${({ theme: { text } }) => text};
+      width: 32px;
+      padding: 2px;
+      height: 32px;
+    }
+  }
+  & h6 {
+    &:hover {
+      text-decoration: underline;
+      background: ${({ theme: { text } }) => colord(text).alpha(0.16).toHex()};
+    }
+    & svg {
+      margin-right: 8px;
+    }
+    padding: 6px;
+
+    position: relative;
+    & a {
+      position: absolute;
+      inset: 0;
+    }
+    border-bottom: 1px solid;
+    border-color: ${({ theme: { text } }) => colord(text).alpha(0.16).toHex()};
+  }
+  flex-direction: column;
+  display: flex;
+`;
+
 const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: string } }> = ({ posts, profileUser }) => {
   const { description, gitHubURL, websiteURL } = profileUser;
+  enum ContentChildrenNameVariants {
+    KICK = 'kick'
+  }
 
   const [isThemeDialogOpen, setIsThemeDialogOpen] = useState(false);
   const [isProfilePropertyiesDialogOpen, setIsProfilePropertyiesDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [isRankDialogOpen, setIsRankDialogOpen] = useState(false);
+
+  const nullityOfDefenderDialogState = {
+    isOpen: false,
+    title: '',
+    submitButtonText: '',
+    onSubmit: () => {},
+    contentChildrenName: '' as ContentChildrenNameVariants
+  };
+  const [valueWhyUserShouldBeKicked, setValueWhyUserShouldBeKicked] = useState('');
+  const [defenderDialogState, setDefenderDialogState] = useState(nullityOfDefenderDialogState);
+
   const [crowns, setCrowns] = useState(profileUser?.crowns || []);
 
   const themePropertyies = useSelector(getThemePropertyies);
@@ -164,7 +218,7 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
   const handleCloseProfilePropertyiesDialog = () => setIsProfilePropertyiesDialogOpen(false);
   const handleCloseDetailsDialog = () => setIsDetailsDialogOpen(false);
   const handleCloseRankDialog = () => setIsRankDialogOpen(false);
-
+  const handleCloseDefenderDialog = () => setDefenderDialogState(nullityOfDefenderDialogState);
   const onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = ({ target: { value, name } }) => {
     setState(state => ({ ...state, [name]: value }));
   };
@@ -198,16 +252,104 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
   const [currentRank, setCurrentRank] = useState(profileUser.rank);
   const d = useFindRankD(currentRank);
 
+  const handleKickUser = async () => {
+    if (profileUser.rank === RankVariants.TRIARII && user?.rank !== RankVariants.IMPERATOR) {
+      return toast(`Only ${RankVariants.IMPERATOR}  can kick ${RankVariants.TRIARII}  `, {
+        type: 'error',
+        theme: 'colored',
+        position: 'bottom-right'
+      });
+    } else if (user?.rank === RankVariants.IMPERATOR || user?.rank === RankVariants.TRIARII) {
+      setValueWhyUserShouldBeKicked(state => {
+        if (state.length < 42) {
+          toast('Please write reason for kick ', {
+            type: 'error',
+            theme: 'colored',
+            position: 'bottom-right'
+          });
+          return '';
+        } else {
+          const docRef = doc(db, 'kicked', profileUser.id);
+          console.log(state.length);
+          setDoc(docRef, {
+            when: Date.now(),
+            by: user?.id,
+            reason: state
+          })
+            .then(res => {
+              toast('User was kicked :) ', {
+                type: 'warning',
+                theme: 'colored',
+                position: 'bottom-right'
+              });
+            })
+            .catch(error => {
+              console.log(error);
+              toast('Something went wrong, try again ', {
+                type: 'error',
+                theme: 'colored',
+                position: 'bottom-right'
+              });
+            });
+          handleCloseDefenderDialog();
+          return state;
+        }
+      });
+    } else {
+      return toast(`Only ${RankVariants.IMPERATOR} or ${RankVariants.TRIARII} can kick users  `, {
+        type: 'error',
+        theme: 'colored',
+        position: 'bottom-right'
+      });
+    }
+  };
   return (
     <>
       <CommentMenu />
+      <Dialog
+        plusZIndex={2}
+        isOpen={defenderDialogState.isOpen}
+        title={defenderDialogState.title}
+        contentChildren={
+          <>
+            {defenderDialogState.contentChildrenName === 'kick' && (
+              <DialogContentContainer>
+                <TextArea
+                  style={{ margin: 0 }}
+                  value={valueWhyUserShouldBeKicked}
+                  maxRows={16}
+                  onChange={({ target: { value } }) => setValueWhyUserShouldBeKicked(value)}
+                  placeholder={'Please, tell why u want kick this user!'}
+                />
+              </DialogContentContainer>
+            )}
+          </>
+        }
+        utilsChildren={
+          <>
+            <Button onClick={handleCloseDefenderDialog}>Cancel</Button>
+            {
+              //@ts-ignore
+              <Button isDangerous onClick={defenderDialogState.onSubmit}>
+                {defenderDialogState.submitButtonText}
+              </Button>
+            }
+          </>
+        }
+      />
+
       <Dialog
         isOpen={isRankDialogOpen}
         title={'Rank system'}
         plusZIndex={1}
         contentChildren={
           <DialogContentContainer>
-            <RankSystem currentRank={currentRank} setCurrentRank={setCurrentRank} userPhotoURL={profileUser.photoURL} />
+            <RankSystem
+              currentRank={currentRank}
+              setCurrentRank={setCurrentRank}
+              userPhotoURL={profileUser.photoURL}
+              isSelfPage={isSelfPage}
+            />
           </DialogContentContainer>
         }
         utilsChildren={
@@ -322,7 +464,15 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
             <SaveButton
               onClick={async () => {
                 if (!user?.id) return;
+                if (state.description.length > 420)
+                  return toast('Max description length is 420 symbols', {
+                    type: 'error',
+                    theme: 'colored',
+                    position: 'bottom-right'
+                  });
+
                 const ref = doc(db, 'users', user?.id);
+
                 try {
                   await updateDoc(ref, {
                     ...state
@@ -354,6 +504,45 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
                 <img src={profileUser.photoURL || ''} width={48} height={48} />
                 {profileUser.displayName}
               </Subtitle>
+              <DescriptionGitHubWebSiteContainer>
+                {websiteURL && (
+                  <Subtitle>
+                    <svg viewBox="0 0 24 24" height={42} width={42}>
+                      <path
+                        fill="currentColor"
+                        d="M16.36,14C16.44,13.34 16.5,12.68 16.5,12C16.5,11.32 16.44,10.66 16.36,10H19.74C19.9,10.64 20,11.31 20,12C20,12.69 19.9,13.36 19.74,14M14.59,19.56C15.19,18.45 15.65,17.25 15.97,16H18.92C17.96,17.65 16.43,18.93 14.59,19.56M14.34,14H9.66C9.56,13.34 9.5,12.68 9.5,12C9.5,11.32 9.56,10.65 9.66,10H14.34C14.43,10.65 14.5,11.32 14.5,12C14.5,12.68 14.43,13.34 14.34,14M12,19.96C11.17,18.76 10.5,17.43 10.09,16H13.91C13.5,17.43 12.83,18.76 12,19.96M8,8H5.08C6.03,6.34 7.57,5.06 9.4,4.44C8.8,5.55 8.35,6.75 8,8M5.08,16H8C8.35,17.25 8.8,18.45 9.4,19.56C7.57,18.93 6.03,17.65 5.08,16M4.26,14C4.1,13.36 4,12.69 4,12C4,11.31 4.1,10.64 4.26,10H7.64C7.56,10.66 7.5,11.32 7.5,12C7.5,12.68 7.56,13.34 7.64,14M12,4.03C12.83,5.23 13.5,6.57 13.91,8H10.09C10.5,6.57 11.17,5.23 12,4.03M18.92,8H15.97C15.65,6.75 15.19,5.55 14.59,4.44C16.43,5.07 17.96,6.34 18.92,8M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+                      />
+                    </svg>
+                    Web site
+                    <Link href={websiteURL}> </Link>
+                  </Subtitle>
+                )}
+                {/* `${crowns.length} Crowns` */}
+                {gitHubURL && (
+                  <Subtitle>
+                    <svg viewBox="0 0 24 24" height={42} width={42}>
+                      <path
+                        fill="currentColor"
+                        d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z"
+                      />
+                    </svg>
+                    Git Hub
+                    <Link href={gitHubURL}> </Link>
+                  </Subtitle>
+                )}
+                {description && (
+                  <Text>
+                    <svg viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M13.5,4A1.5,1.5 0 0,0 12,5.5A1.5,1.5 0 0,0 13.5,7A1.5,1.5 0 0,0 15,5.5A1.5,1.5 0 0,0 13.5,4M13.14,8.77C11.95,8.87 8.7,11.46 8.7,11.46C8.5,11.61 8.56,11.6 8.72,11.88C8.88,12.15 8.86,12.17 9.05,12.04C9.25,11.91 9.58,11.7 10.13,11.36C12.25,10 10.47,13.14 9.56,18.43C9.2,21.05 11.56,19.7 12.17,19.3C12.77,18.91 14.38,17.8 14.54,17.69C14.76,17.54 14.6,17.42 14.43,17.17C14.31,17 14.19,17.12 14.19,17.12C13.54,17.55 12.35,18.45 12.19,17.88C12,17.31 13.22,13.4 13.89,10.71C14,10.07 14.3,8.67 13.14,8.77Z"
+                      />
+                    </svg>
+                    {description}
+                  </Text>
+                )}
+              </DescriptionGitHubWebSiteContainer>
+
               {
                 <Button onClick={() => setIsRankDialogOpen(true)}>
                   <svg viewBox="0 0 24 24" width={42} height={42}>
@@ -377,31 +566,32 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
                   {isCrownWasGiven ? 'Deprive fire' : 'Give fire'}
                 </Button>
               }
-              {websiteURL && (
-                <Subtitle>
-                  <svg viewBox="0 0 24 24" height={42} width={42}>
-                    <path
-                      fill="currentColor"
-                      d="M16.36,14C16.44,13.34 16.5,12.68 16.5,12C16.5,11.32 16.44,10.66 16.36,10H19.74C19.9,10.64 20,11.31 20,12C20,12.69 19.9,13.36 19.74,14M14.59,19.56C15.19,18.45 15.65,17.25 15.97,16H18.92C17.96,17.65 16.43,18.93 14.59,19.56M14.34,14H9.66C9.56,13.34 9.5,12.68 9.5,12C9.5,11.32 9.56,10.65 9.66,10H14.34C14.43,10.65 14.5,11.32 14.5,12C14.5,12.68 14.43,13.34 14.34,14M12,19.96C11.17,18.76 10.5,17.43 10.09,16H13.91C13.5,17.43 12.83,18.76 12,19.96M8,8H5.08C6.03,6.34 7.57,5.06 9.4,4.44C8.8,5.55 8.35,6.75 8,8M5.08,16H8C8.35,17.25 8.8,18.45 9.4,19.56C7.57,18.93 6.03,17.65 5.08,16M4.26,14C4.1,13.36 4,12.69 4,12C4,11.31 4.1,10.64 4.26,10H7.64C7.56,10.66 7.5,11.32 7.5,12C7.5,12.68 7.56,13.34 7.64,14M12,4.03C12.83,5.23 13.5,6.57 13.91,8H10.09C10.5,6.57 11.17,5.23 12,4.03M18.92,8H15.97C15.65,6.75 15.19,5.55 14.59,4.44C16.43,5.07 17.96,6.34 18.92,8M12,2C6.47,2 2,6.5 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                    />
-                  </svg>
 
-                  <Link href={websiteURL}> Web site </Link>
-                </Subtitle>
-              )}
-              {/* `${crowns.length} Crowns` */}
-              {gitHubURL && (
-                <Subtitle>
-                  <svg viewBox="0 0 24 24" height={42} width={42}>
+              {
+                <Button
+                  onClick={() =>
+                    setDefenderDialogState({
+                      isOpen: true,
+                      onSubmit: handleKickUser,
+                      contentChildrenName: ContentChildrenNameVariants.KICK,
+                      submitButtonText: 'Kick',
+                      title: 'Are u sure that you want kick this user?'
+                    })
+                  }
+                  //@ts-ignore
+                  isDangerous
+                >
+                  <svg viewBox="0 0 24 24" width={42} height={42}>
                     <path
                       fill="currentColor"
-                      d="M12,2A10,10 0 0,0 2,12C2,16.42 4.87,20.17 8.84,21.5C9.34,21.58 9.5,21.27 9.5,21C9.5,20.77 9.5,20.14 9.5,19.31C6.73,19.91 6.14,17.97 6.14,17.97C5.68,16.81 5.03,16.5 5.03,16.5C4.12,15.88 5.1,15.9 5.1,15.9C6.1,15.97 6.63,16.93 6.63,16.93C7.5,18.45 8.97,18 9.54,17.76C9.63,17.11 9.89,16.67 10.17,16.42C7.95,16.17 5.62,15.31 5.62,11.5C5.62,10.39 6,9.5 6.65,8.79C6.55,8.54 6.2,7.5 6.75,6.15C6.75,6.15 7.59,5.88 9.5,7.17C10.29,6.95 11.15,6.84 12,6.84C12.85,6.84 13.71,6.95 14.5,7.17C16.41,5.88 17.25,6.15 17.25,6.15C17.8,7.5 17.45,8.54 17.35,8.79C18,9.5 18.38,10.39 18.38,11.5C18.38,15.32 16.04,16.16 13.81,16.41C14.17,16.72 14.5,17.33 14.5,18.26C14.5,19.6 14.5,20.68 14.5,21C14.5,21.27 14.66,21.59 15.17,21.5C19.14,20.16 22,16.42 22,12A10,10 0 0,0 12,2Z"
+                      d={
+                        'M19,1.27C18.04,0.72 16.82,1.04 16.27,2C15.71,2.95 16.04,4.18 17,4.73C17.95,5.28 19.17,4.96 19.73,4C20.28,3.04 19.95,1.82 19,1.27M21.27,9.34L18.7,13.79L16.96,12.79L18.69,9.79L17.14,8.5L14,13.92V22H12V13.39L2.47,7.89L3.47,6.16L11.27,10.66L13.67,6.5L7.28,4.17L8,2.29L14.73,4.74L15,4.84C15.39,5 15.76,5.15 16.12,5.35L16.96,5.84C17.31,6.04 17.65,6.28 17.96,6.54L18.19,6.74L21.27,9.34Z'
+                      }
                     />
                   </svg>
-                  <Link href={gitHubURL}> Git Hub </Link>
-                </Subtitle>
-              )}
-              <Text>{description}</Text>
+                  {'Kick user'}
+                </Button>
+              }
             </ProfilePropertiesContainer>
           </DialogContentContainer>
         }

@@ -2,6 +2,10 @@ import { colord } from 'colord';
 import styled from 'styled-components';
 
 export default styled.div`
+  opacity: ${({
+    //@ts-ignore
+    isHaveAccess =true
+  }) => (isHaveAccess ? 1 : 0.42)};
   border-bottom: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.16).toHex()};
   display: flex;
   align-items: center;

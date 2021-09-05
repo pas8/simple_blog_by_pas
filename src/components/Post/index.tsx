@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import Text from '../Text';
 import { db } from '../../layouts/FirebaseLayout';
-import { CommentType, PostType } from '../../models/types';
+import { CommentType, PostType, RankVariants } from '../../models/types';
 import { useRouter } from 'next/dist/client/router';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
@@ -278,7 +278,8 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
     if (
       !collaborators.includes(user?.id || '_') &&
       user?.id !== maintainer &&
-      user?.id !== 'KbbFz5vR5HXzKeiHT1TMWwRAoQ22'
+      user?.rank !== RankVariants.IMPERATOR &&
+      user?.rank !== RankVariants.TRIARII
     )
       return toast('You dont have acess for editing', {
         type: 'error',

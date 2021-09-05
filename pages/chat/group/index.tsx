@@ -3,15 +3,21 @@ import { db } from '../../../src/layouts/FirebaseLayout';
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { getUser } from '../../../src/store/modules/App/selectors';
-import { MessageType } from '../../../src/models/types';
+import { MessageType, RankVariants } from '../../../src/models/types';
 import { toast } from 'react-toastify';
 import ChatMainPart from '../../../src/components/ChatMainPart';
+import { useUnLoginedUserDefender } from '../../../src/hooks/useUnLoginedUserDefender.hook';
 
 const GroupChat = () => {
   const user = useSelector(getUser);
-  const messageCollection = collection(db, 'messages');
 
+  const [condition, placeholder] = useUnLoginedUserDefender(user?.id || '', user?.rank === RankVariants.HASTATI);
+
+  const [messageValue, setMessageValue] = useState('');
   const [messages, setMessages] = useState<MessageType[]>([]);
+
+  if (condition) return placeholder;
+  const messageCollection = collection(db, 'messages');
 
   onSnapshot(messageCollection, {
     next: snap =>
@@ -24,7 +30,6 @@ const GroupChat = () => {
         )
   });
 
-  const [messageValue, setMessageValue] = useState('');
   const handleAddMessage = async () => {
     await addDoc(messageCollection, {
       created: Date.now(),
@@ -76,7 +81,7 @@ const GroupChat = () => {
         titleURL={'/dbsynm'}
         isPrivateMode
         titlePhoto={
-            'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAP8AAACqCAMAAABVlWm8AAAABlBMVEUAV7f/1wDfELsCAAAAhElEQVR4nO3PMQEAAAjAIO1f2hRegwbMAAAAAAAAAAAAAAAAAAAAAAAAAAAAPNk2/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv+2A+BhVKwOtdkDAAAAAElFTkSuQmCC'
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAP8AAACqCAMAAABVlWm8AAAABlBMVEUAV7f/1wDfELsCAAAAhElEQVR4nO3PMQEAAAjAIO1f2hRegwbMAAAAAAAAAAAAAAAAAAAAAAAAAAAAPNk2/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv82/zb/Nv+2A+BhVKwOtdkDAAAAAElFTkSuQmCC'
         }
         handleAddMessage={handleAddMessage}
         handleDeleteMessage={handleDeleteMessage}
