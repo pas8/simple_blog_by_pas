@@ -1,5 +1,5 @@
 import { colord } from 'colord';
-import { collection, doc, getDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where, orderBy } from 'firebase/firestore';
 import { useRouter } from 'next/dist/client/router';
 import { FC, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,6 +20,7 @@ import dynamic from 'next/dynamic';
 import PostMasonry from '../src/components/PostMasonry';
 import UserPhoto from '../src/components/UserPhoto';
 import CommentMenu from '../src/components/CommentMenu';
+import SignOutIconButton from '../src/components/SignOutIconButton';
 
 const MainTitle = dynamic(() => import('../src/components/MainTitle'), { ssr: false });
 
@@ -79,9 +80,9 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
   const dispatch = useDispatch();
   const user = useSelector(getUser);
   const themePropertyies = useSelector(getThemePropertyies);
-// console.log(user)
+  // console.log(user)
   // useEffect(() => {
-    // dispatch(toChangeThemePropertyies({ themePropertyies: { ...themePropertyies, primary: user?.primaryColor } }));
+  // dispatch(toChangeThemePropertyies({ themePropertyies: { ...themePropertyies, primary: user?.primaryColor } }));
   // }, [user?.primaryColor]);
 
   const isAuth = !!user;
@@ -171,7 +172,13 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
                   : 'M20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12 20 8.69zm-2 5.79V18h-3.52L12 20.48 9.52 18H6v-3.52L3.52 12 6 9.52V6h3.52L12 3.52 14.48 6H18v3.52L20.48 12 18 14.48zM12.29 7c-.74 0-1.45.17-2.08.46 1.72.79 2.92 2.53 2.92 4.54s-1.2 3.75-2.92 4.54c.63.29 1.34.46 2.08.46 2.76 0 5-2.24 5-5s-2.24-5-5-5z'
               }
             />
-
+            <IconButton
+              position={'relative'}
+              onClick={() => push('/kicked')}
+              d={
+                'M19,1.27C18.04,0.72 16.82,1.04 16.27,2C15.71,2.95 16.04,4.18 17,4.73C17.95,5.28 19.17,4.96 19.73,4C20.28,3.04 19.95,1.82 19,1.27M21.27,9.34L18.7,13.79L16.96,12.79L18.69,9.79L17.14,8.5L14,13.92V22H12V13.39L2.47,7.89L3.47,6.16L11.27,10.66L13.67,6.5L7.28,4.17L8,2.29L14.73,4.74L15,4.84C15.39,5 15.76,5.15 16.12,5.35L16.96,5.84C17.31,6.04 17.65,6.28 17.96,6.54L18.19,6.74L21.27,9.34Z'
+              }
+            />
             {!isAuth ? (
               <SignInButton onClick={handleAuthorisate}>Log in</SignInButton>
             ) : (
@@ -184,14 +191,7 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
                   d="M20 17.17L18.83 16H4V4h16v13.17zM20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2z"
                 />
 
-                <IconButton
-                  onClick={() => {
-                    dispatch(toChangeUser({ user: null }));
-                    signOut(auth);
-                  }}
-                  position={'relative'}
-                  d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
-                />
+                <SignOutIconButton />
                 <UserPhoto src={user?.photoURL || ''} onClick={() => push(`/profile/${user?.id}`)} />
               </>
             )}
@@ -219,7 +219,17 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
 export default Index;
 
 export const getServerSideProps = async () => {
-  const querySnapshot = await getDocs(collection(db, 'posts'));
+  let kickedUsersArr: string[] = [];
+  const kickedUsersRef = collection(db, 'kicked');
+  const kickedUsersSnap = await getDocs(kickedUsersRef);
+
+  kickedUsersSnap.forEach(async doc => {
+    kickedUsersArr.push(doc.id);
+  });
+  const q = query(collection(db, 'posts'), where('maintainer', 'not-in',  !!kickedUsersArr.length ? kickedUsersArr : [{maintainer:''}]));
+
+  const querySnapshot = await getDocs(q);
+
   const posts: PostType[] = [];
   querySnapshot.forEach(async doc => {
     posts.push({ ...doc.data(), id: doc.id } as PostType);

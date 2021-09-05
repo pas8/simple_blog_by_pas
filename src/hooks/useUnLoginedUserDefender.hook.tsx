@@ -26,5 +26,5 @@ export const useUnLoginedUserDefender = (
       theme: 'colored',
       position: 'bottom-right'
     });
-  return [isCondition, <></>, user];
+  return [isCondition, <></>, user as ProfileType];
 };

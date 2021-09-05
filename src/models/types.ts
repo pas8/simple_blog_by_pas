@@ -36,12 +36,11 @@ export type CreatingPostPartPropsType = {
   setState: Dispatch<SetStateAction<StateOfCreatingPostPartPropsType>>;
 };
 
-
-export const enum RankVariants  {
+export const enum RankVariants {
   HASTATI = 'hastati',
-  PRINCIPES='principes',
-  TRIARII='triarii',
-  IMPERATOR='imperator'
+  PRINCIPES = 'principes',
+  TRIARII = 'triarii',
+  IMPERATOR = 'imperator'
 }
 export type ProfileDocType = {
   [Property in 'email' | 'photoURL' | 'displayName']: string;
@@ -50,7 +49,7 @@ export type ProfileDocType = {
   isThemeDark: boolean;
   description: string;
   crowns: string[];
-  rank:RankVariants
+  rank: RankVariants;
   websiteURL: string;
   gitHubURL: string;
 };
@@ -64,7 +63,6 @@ export type ChatMessageMenuPropsType = {
   handleUpdateMessage: (id: string, value: string) => void;
 };
 
-
 export type ChatMainPartPropsType = {
   messages: MessageType[];
   title?: string;
@@ -75,3 +73,12 @@ export type ChatMainPartPropsType = {
   messageValue: string;
   setMessageValue: Dispatch<SetStateAction<string>>;
 } & ChatMessageMenuPropsType;
+
+export type KickedUserType = {
+  when: number;
+  by: string;
+  id: string;
+  justification:string;
+  reason: string;
+    
+};

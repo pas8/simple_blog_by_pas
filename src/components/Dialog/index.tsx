@@ -30,7 +30,14 @@ const DialogContainer = styled.div`
   place-items: center;
   z-index: 100;
   inset: 0;
-  background: ${({ theme: { background } }) => colord(background).alpha(0.8).toHex()};
+  background: ${({
+    theme: { background },
+    //@ts-ignore
+    isIsolated
+  }) =>
+    colord(background)
+      .alpha(isIsolated ? 1 : 0.8)
+      .toHex()};
 `;
 
 const Dialog: FC<{
@@ -39,10 +46,12 @@ const Dialog: FC<{
   contentChildren?: ReactNode;
   title: string;
   plusZIndex?: number;
-}> = ({ isOpen, title, plusZIndex = 0, utilsChildren, contentChildren }) => {
+  isIsolated?: boolean;
+}> = ({ isOpen, title, plusZIndex = 0, utilsChildren, contentChildren, isIsolated = false }) => {
   if (!isOpen) return <></>;
   return (
-    <DialogContainer style={{ zIndex: 100 + plusZIndex }}>
+    //@ts-ignore
+    <DialogContainer style={{ zIndex: 100 + plusZIndex }} isIsolated={isIsolated}>
       <DialogContentContainer>
         <Subtitle>{title}</Subtitle>
         <DialogMainContainer>{contentChildren}</DialogMainContainer>
