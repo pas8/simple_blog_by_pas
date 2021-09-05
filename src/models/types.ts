@@ -36,6 +36,13 @@ export type CreatingPostPartPropsType = {
   setState: Dispatch<SetStateAction<StateOfCreatingPostPartPropsType>>;
 };
 
+
+export const enum RankVariants  {
+  HASTATI = 'hastati',
+  PRINCIPES='principes',
+  TRIARII='triarii',
+  IMPERATOR='imperator'
+}
 export type ProfileDocType = {
   [Property in 'email' | 'photoURL' | 'displayName']: string;
 } & {
@@ -43,6 +50,7 @@ export type ProfileDocType = {
   isThemeDark: boolean;
   description: string;
   crowns: string[];
+  rank:RankVariants
   websiteURL: string;
   gitHubURL: string;
 };

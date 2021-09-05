@@ -36,8 +36,9 @@ const Comment: FC<CommentType & { isSelfComment: boolean; postId: string }> = me
   const user = useFindUser(by);
   const dispatch = useDispatch();
 
-  const onClick: MouseEventHandler<HTMLDivElement> = ({ clientX, clientY }) => {
-    dispatch(toChangeCommentMenuProperties({ commentMenuProperties: { ...messageProps, x: clientX, y: clientY } }));
+  const onClick = ({ pageX, pageY, view: { window } }: any) => {
+    const x = window?.innerWidth - pageX < 320 ? window?.innerWidth - 320 : pageX;
+    dispatch(toChangeCommentMenuProperties({ commentMenuProperties: { ...messageProps, x, y: pageY } }));
   };
   return (
     <CommentContainer onClick={onClick} className={'commentItemContainer'}>

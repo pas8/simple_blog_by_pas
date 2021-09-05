@@ -1,6 +1,6 @@
 import { collection, query, where, getDocs, getDoc, doc, updateDoc } from 'firebase/firestore';
 import { useRouter } from 'next/dist/client/router';
-import { ChangeEventHandler, FC, MouseEventHandler, MutableRefObject, useEffect, useRef, useState } from 'react';
+import { ChangeEventHandler, FC,  useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { HexColorPicker } from 'react-colorful';
 import styled from 'styled-components';
@@ -9,15 +9,13 @@ import CenteredContainerWithBackButton from '../../src/components/CenteredContai
 import PostMasonry from '../../src/components/PostMasonry';
 import Title from '../../src/components/Title';
 import { db } from '../../src/layouts/FirebaseLayout';
-import { PostType, ProfileDocType, ThemeType } from '../../src/models/types';
+import { PostType, ProfileDocType, RankVariants} from '../../src/models/types';
 import { getThemePropertyies, getUser } from '../../src/store/modules/App/selectors';
 
 import IconButton from '../../src/components/IconButton';
 import Dialog from '../../src/components/Dialog';
 import CloseButton from '../../src/components/CloseButton';
 import SaveButton from '../../src/components/SaveButton';
-import { toChangeThemePropertyies } from '../../src/store/modules/App/actions';
-import { colord } from 'colord';
 import { toast } from 'react-toastify';
 import Subtitle from '../../src/components/Subtitle';
 
@@ -29,19 +27,36 @@ import { capitalize } from 'lodash';
 import Link from 'next/link';
 import Button from '../../src/components/Button';
 import CommentMenu from '../../src/components/CommentMenu';
+import { useFindRankD } from '../../src/hooks/useFindRankD.hook';
+import RankSystem from '../../src/components/RankSystem';
+import { useUploadUsersTheme } from '../../src/hooks/useUploadUsersTheme.hook';
 
 const ProfileContainer = dynamic(() => import('../../src/components/ProfileContainer'), { ssr: false });
 
-const Img = styled.img`
-  width: 4rem;
-  margin-right: 10px;
-  height: 4rem;
-  border-radius: 50%;
+const ImgContainer = styled.div`
+  margin-right: 8px;
+  display: flex;
+  align-itens: center;
+  position: relative;
+  & img {
+    width: 4rem;
+    margin-right: 10px;
+    height: 4rem;
+    border-radius: 50%;
+  }
 `;
 const TitleWrapper = styled.div`
   display: flex;
   position: relative;
   align-items: center;
+  & .rankSvg {
+    &:hover {
+      cursor: pointer;
+      & path {
+        fill: ${({ theme: { primary } }) => primary};
+      }
+    }
+  }
 `;
 const SvgContainer = styled.div`
   position: absolute;
@@ -51,6 +66,7 @@ const SvgContainer = styled.div`
   top: 16px;
 `;
 const DialogContentContainer = styled.div`
+  width: 100%;
   & .react-colorful {
     height: 240px;
     width: 280px;
@@ -116,22 +132,22 @@ const CrownPreviewContainer = styled.div`
     cursor: pointer;
   }
   display: flex;
-  top: 4px;
-  left: 42px;
+  top: -4px;
+  right: -4px;
   position: absolute;
   align-items: center;
 `;
+
 const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: string } }> = ({ posts, profileUser }) => {
   const { description, gitHubURL, websiteURL } = profileUser;
-  const dispatch = useDispatch();
 
   const [isThemeDialogOpen, setIsThemeDialogOpen] = useState(false);
   const [isProfilePropertyiesDialogOpen, setIsProfilePropertyiesDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
+  const [isRankDialogOpen, setIsRankDialogOpen] = useState(false);
   const [crowns, setCrowns] = useState(profileUser?.crowns || []);
 
   const themePropertyies = useSelector(getThemePropertyies);
-  const [maintheme, setMainTheme] = useState<ThemeType>(themePropertyies);
 
   const user = useSelector(getUser);
   const { push } = useRouter();
@@ -140,27 +156,14 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
   const [state, setState] = useState(nulittyState);
   const [primary, setPrimary] = useState(themePropertyies.primary);
 
-  useEffect(() => {
-    dispatch(
-      toChangeThemePropertyies({
-        themePropertyies: {
-          ...themePropertyies,
-          primary:
-            colord(themePropertyies.background).isDark() && colord(profileUser.primaryColor).isDark()
-              ? colord(profileUser.primaryColor).invert().toHex()
-              : profileUser.primaryColor
-        }
-      })
-    );
-    return () => {
-      dispatch(toChangeThemePropertyies({ themePropertyies: maintheme }));
-    };
-  }, []);
+  useUploadUsersTheme(profileUser);
+
   const isSelfPage = user?.id === profileUser.id;
 
   const handleCloseThemeDialog = () => setIsThemeDialogOpen(false);
   const handleCloseProfilePropertyiesDialog = () => setIsProfilePropertyiesDialogOpen(false);
   const handleCloseDetailsDialog = () => setIsDetailsDialogOpen(false);
+  const handleCloseRankDialog = () => setIsRankDialogOpen(false);
 
   const onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = ({ target: { value, name } }) => {
     setState(state => ({ ...state, [name]: value }));
@@ -192,13 +195,72 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
     }
   };
 
+  const [currentRank, setCurrentRank] = useState(profileUser.rank);
+  const d = useFindRankD(currentRank);
+
   return (
     <>
       <CommentMenu />
       <Dialog
+        isOpen={isRankDialogOpen}
+        title={'Rank system'}
+        plusZIndex={1}
+        contentChildren={
+          <DialogContentContainer>
+            <RankSystem currentRank={currentRank} setCurrentRank={setCurrentRank} userPhotoURL={profileUser.photoURL} />
+          </DialogContentContainer>
+        }
+        utilsChildren={
+          <>
+            <CloseButton onClick={handleCloseRankDialog} />
+            <SaveButton
+              onClick={async () => {
+                //@ts-ignore
+                const rankArr = Object.values(RankVariants).reverse();
+                const rankIdx = rankArr.findIndex(el => el === profileUser.rank);
+                if (!user?.rank)
+                  return toast('You dont have accesss for than, please sign in!(  ', {
+                    type: 'error',
+                    theme: 'colored',
+                    position: 'bottom-right'
+                  });
+                if (rankArr.findIndex(el => el === user?.rank) >= rankIdx)
+                  return toast('Your rank is the same or lower than this user :(  ', {
+                    type: 'error',
+                    theme: 'colored',
+                    position: 'bottom-right'
+                  });
+
+                const docRef = doc(db, 'users', profileUser.id);
+                try {
+                  await updateDoc(docRef, {
+                    rank: currentRank
+                  });
+                } catch (error) {
+                  console.log(error);
+                  setCurrentRank(profileUser.rank);
+                  toast('Something wents wrong:()  ', {
+                    type: 'error',
+                    theme: 'colored',
+                    position: 'bottom-right'
+                  });
+                }
+
+                handleCloseRankDialog();
+              }}
+            />
+          </>
+        }
+      />
+
+      <Dialog
         isOpen={isThemeDialogOpen}
         title={'Change theme color'}
-        contentChildren={<DialogContentContainer></DialogContentContainer>}
+        contentChildren={
+          <DialogContentContainer>
+            <HexColorPicker color={primary} onChange={setPrimary} />
+          </DialogContentContainer>
+        }
         utilsChildren={
           <>
             <CloseButton onClick={handleCloseThemeDialog} />
@@ -289,21 +351,30 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
           <DialogContentContainer>
             <ProfilePropertiesContainer>
               <Subtitle className={'title'}>
-                <img src={profileUser.photoURL || ''} width={48} height={48} />${profileUser.displayName}
+                <img src={profileUser.photoURL || ''} width={48} height={48} />
+                {profileUser.displayName}
               </Subtitle>
               {
-                <Button onClick={handleChangeCrowns}>
+                <Button onClick={() => setIsRankDialogOpen(true)}>
+                  <svg viewBox="0 0 24 24" width={42} height={42}>
+                    <path fill="currentColor" d={d} />
+                  </svg>
+                  {capitalize(currentRank)} Rank
+                </Button>
+              }
+
+              {
+                //@ts-ignore
+                <Button onClick={handleChangeCrowns} isDefault={isCrownWasGiven}>
                   <svg viewBox="0 0 24 24" width={42} height={42}>
                     <path
                       fill="currentColor"
                       d={
-                        isCrownWasGiven
-                          ? 'M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5M19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z'
-                          : 'M12 8L15 13.2L18 10.5L17.3 14H6.7L6 10.5L9 13.2L12 8M12 4L8.5 10L3 5L5 16H19L21 5L15.5 10L12 4M19 18H5V19C5 19.6 5.4 20 6 20H18C18.6 20 19 19.6 19 19V18Z'
+                        'M17.66 11.2C17.43 10.9 17.15 10.64 16.89 10.38C16.22 9.78 15.46 9.35 14.82 8.72C13.33 7.26 13 4.85 13.95 3C13 3.23 12.17 3.75 11.46 4.32C8.87 6.4 7.85 10.07 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C6.87 12.33 6.69 10.28 7.45 8.64C5.78 10 4.87 12.3 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C18.86 17.66 19.5 15 18.56 12.72L18.43 12.46C18.22 12 17.66 11.2 17.66 11.2M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.78 14.43 12.46 13.77 12.33 13C12.21 12.26 12.23 11.63 12.5 10.94C12.69 11.32 12.89 11.7 13.13 12C13.9 13 15.11 13.44 15.37 14.8C15.41 14.94 15.43 15.08 15.43 15.23C15.46 16.05 15.1 16.95 14.5 17.5H14.5Z'
                       }
                     />
                   </svg>
-                  {isCrownWasGiven ? 'Deprive crown' : 'Give crown'}
+                  {isCrownWasGiven ? 'Deprive fire' : 'Give fire'}
                 </Button>
               }
               {websiteURL && (
@@ -369,24 +440,34 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
         <ProfileContainer>
           <Title>
             <TitleWrapper>
-              {<Img src={profileUser.photoURL || ''} />}${profileUser?.displayName || profileUser?.email}
-              {
-                //@ts-ignore
-                <CrownPreviewContainer isCrownWasGiven={isCrownWasGiven} onClick={handleChangeCrowns}>
-                  {crowns.length}
+              <ImgContainer>
+                {
+                  //@ts-ignore
+                  <CrownPreviewContainer isCrownWasGiven={isCrownWasGiven} onClick={handleChangeCrowns}>
+                    {crowns.length}
 
-                  <svg viewBox="0 0 24 24" width={22} height={22}>
-                    <path
-                      fill="currentColor"
-                      d={
-                        isCrownWasGiven
-                          ? 'M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5M19 19C19 19.6 18.6 20 18 20H6C5.4 20 5 19.6 5 19V18H19V19Z'
-                          : 'M12 8L15 13.2L18 10.5L17.3 14H6.7L6 10.5L9 13.2L12 8M12 4L8.5 10L3 5L5 16H19L21 5L15.5 10L12 4M19 18H5V19C5 19.6 5.4 20 6 20H18C18.6 20 19 19.6 19 19V18Z'
-                      }
-                    />
-                  </svg>
-                </CrownPreviewContainer>
-              }
+                    <svg viewBox="0 0 24 24" width={22} height={22}>
+                      <path
+                        fill={'currentColor'}
+                        d={
+                          'M17.66 11.2C17.43 10.9 17.15 10.64 16.89 10.38C16.22 9.78 15.46 9.35 14.82 8.72C13.33 7.26 13 4.85 13.95 3C13 3.23 12.17 3.75 11.46 4.32C8.87 6.4 7.85 10.07 9.07 13.22C9.11 13.32 9.15 13.42 9.15 13.55C9.15 13.77 9 13.97 8.8 14.05C8.57 14.15 8.33 14.09 8.14 13.93C8.08 13.88 8.04 13.83 8 13.76C6.87 12.33 6.69 10.28 7.45 8.64C5.78 10 4.87 12.3 5 14.47C5.06 14.97 5.12 15.47 5.29 15.97C5.43 16.57 5.7 17.17 6 17.7C7.08 19.43 8.95 20.67 10.96 20.92C13.1 21.19 15.39 20.8 17.03 19.32C18.86 17.66 19.5 15 18.56 12.72L18.43 12.46C18.22 12 17.66 11.2 17.66 11.2M14.5 17.5C14.22 17.74 13.76 18 13.4 18.1C12.28 18.5 11.16 17.94 10.5 17.28C11.69 17 12.4 16.12 12.61 15.23C12.78 14.43 12.46 13.77 12.33 13C12.21 12.26 12.23 11.63 12.5 10.94C12.69 11.32 12.89 11.7 13.13 12C13.9 13 15.11 13.44 15.37 14.8C15.41 14.94 15.43 15.08 15.43 15.23C15.46 16.05 15.1 16.95 14.5 17.5H14.5Z'
+                        }
+                      />
+                    </svg>
+                  </CrownPreviewContainer>
+                }
+                <img src={profileUser.photoURL || ''} />
+              </ImgContainer>
+              <svg
+                viewBox={'0 0 24 24'}
+                width={60}
+                height={60}
+                className={'rankSvg'}
+                onClick={() => setIsRankDialogOpen(true)}
+              >
+                <path fill={'currentColor'} d={d} />
+              </svg>
+              {profileUser?.displayName || profileUser?.email}
             </TitleWrapper>
           </Title>
         </ProfileContainer>
