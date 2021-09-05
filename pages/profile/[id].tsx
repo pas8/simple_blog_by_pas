@@ -274,7 +274,8 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
           setDoc(docRef, {
             when: Date.now(),
             by: user?.id,
-            reason: state
+            reason: state,
+            isAskedForRestoring: false
           })
             .then(res => {
               toast('User was kicked :) ', {
