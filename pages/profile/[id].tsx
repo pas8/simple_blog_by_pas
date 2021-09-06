@@ -1,8 +1,14 @@
 import { collection, query, where, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/dist/client/router';
+import { NextSeo, SocialProfileJsonLd } from 'next-seo';
 import { ChangeEventHandler, FC, useState } from 'react';
+import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import { HexColorPicker } from 'react-colorful';
+import { colord } from 'colord';
+import dynamic from 'next/dynamic';
+import { capitalize } from 'lodash';
+import Link from 'next/link';
 import styled from 'styled-components';
 
 import CenteredContainerWithBackButton from '../../src/components/CenteredContainerWithBackButton';
@@ -11,27 +17,21 @@ import Title from '../../src/components/Title';
 import { db } from '../../src/layouts/FirebaseLayout';
 import { PostType, ProfileDocType, RankVariants } from '../../src/models/types';
 import { getThemePropertyies, getUser } from '../../src/store/modules/App/selectors';
-
 import IconButton from '../../src/components/IconButton';
 import Dialog from '../../src/components/Dialog';
 import CloseButton from '../../src/components/CloseButton';
 import SaveButton from '../../src/components/SaveButton';
-import { toast } from 'react-toastify';
 import Subtitle from '../../src/components/Subtitle';
-
-import dynamic from 'next/dynamic';
 import Text from '../../src/components/Text';
 import TextArea from '../../src/components/CreatingPostPart/components/TextArea';
 import Input from '../../src/components/Input';
-import { capitalize } from 'lodash';
-import Link from 'next/link';
 import Button from '../../src/components/Button';
 import CommentMenu from '../../src/components/CommentMenu';
 import { useFindRankD } from '../../src/hooks/useFindRankD.hook';
 import RankSystem from '../../src/components/RankSystem';
 import { useUploadUsersTheme } from '../../src/hooks/useUploadUsersTheme.hook';
-import { colord } from 'colord';
 import CrownPreviewContainer from '../../src/components/CrownPreviewContainer';
+import { useImgSeo } from '../../src/hooks/useImgSeo.hook';
 
 const ProfileContainer = dynamic(() => import('../../src/components/ProfileContainer'), { ssr: false });
 
@@ -109,8 +109,6 @@ const ProfilePropertiesContainer = styled.div`
     width: 320px;
   }
 `;
-
-
 
 const DescriptionGitHubWebSiteContainer = styled.div`
   border: 1px solid;
@@ -285,6 +283,24 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
   };
   return (
     <>
+      <SocialProfileJsonLd
+        type={'Person'}
+        name={profileUser.displayName}
+        url={`https://simple-blog-by-pas.vercel.app/profile/${profileUser.id}`}
+        sameAs={[profileUser.gitHubURL, profileUser.websiteURL]}
+      />
+      <NextSeo
+        title={profileUser.displayName}
+        description={profileUser.description}
+        canonical={`https://simple-blog-by-pas.vercel.app/profile/${profileUser.id}`}
+        openGraph={{
+          url: `https://simple-blog-by-pas.vercel.app/profile/${profileUser.id}`,
+          title: profileUser.displayName,
+          description: profileUser.description,
+          images: useImgSeo(posts)
+        }}
+      />
+
       {isCensureDialogOpen ? (
         <Dialog
           plusZIndex={4}

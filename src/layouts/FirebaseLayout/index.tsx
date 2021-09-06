@@ -1,7 +1,8 @@
 import { FC } from 'react';
-import { initializeApp ,} from 'firebase/app';
-import { getFirestore } from "firebase/firestore"
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import { DefaultSeo } from 'next-seo';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyAPQBWtnZJWSUG4j96HZ5UMBBYV0deQK6M',
@@ -13,11 +14,24 @@ const firebaseConfig = {
   measurementId: 'G-V9M8FMKGFN'
 };
 export const app = initializeApp(firebaseConfig);
-export const db = getFirestore( )
+export const db = getFirestore();
 export const storage = getStorage(app);
 
 const FirebaseLayout: FC = ({ children }) => {
-  return <>{children}</>;
+  return (
+    <>
+      <DefaultSeo
+        openGraph={{
+          type: 'website',
+          locale: 'en_IE',
+          url: `https://simple-blog-by-pas.vercel.app`,
+          site_name: 'Simple blog'
+        }}
+      />
+
+      {children}
+    </>
+  );
 };
 
 export default FirebaseLayout;
