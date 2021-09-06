@@ -14,8 +14,8 @@ import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
 import PostMasonry from '../src/components/PostMasonry';
 import CommentMenu from '../src/components/CommentMenu';
-import { BlogJsonLd,NextSeo } from 'next-seo';
-import { useImgSeo, } from '../src/hooks/useImgSeo.hook';
+import { BlogJsonLd, NextSeo } from 'next-seo';
+import { useImgSeo } from '../src/hooks/useImgSeo.hook';
 
 const MainTitle = dynamic(() => import('../src/components/MainTitle'), { ssr: false });
 const HeaderMenu = dynamic(() => import('../src/components/HeaderMenu'));
@@ -67,7 +67,8 @@ const AddButton = styled.button`
 const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
   const { push } = useRouter();
   const user = useSelector(getUser);
-
+  const description =
+    'This is a open-source blog platform, where everyone can write blogs, which will publish to the main blog, where everyone can see your post.';
   return (
     <>
       <BlogJsonLd
@@ -77,22 +78,19 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
         title={'Simple blog'}
         images={posts.map(({ bg_image }) => bg_image)}
         authorName={'PAS'}
-        description={
-          'This is a open sourse blog pltform, where every can write blogs, which will publish to main blog, where eryone can see your post.'
-        }
+        description={description}
       />
 
       <NextSeo
         title={'Simple blog'}
         description={
-          'This is a open sourse blog pltform, where every can write blogs, which will publish to main blog, where eryone can see your post.'
+          description
         }
         canonical={`https://simple-blog-by-pas.vercel.app`}
         openGraph={{
           url: `https://simple-blog-by-pas.vercel.app`,
           title: 'Simple blog',
-          description:
-            'This is a open sourse blog pltform, where every can write blogs, which will publish to main blog, where eryone can see your post.',
+          description,
           images: useImgSeo(posts),
           site_name: 'Simple blog'
         }}

@@ -285,11 +285,13 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
     <>
       <SocialProfileJsonLd
         type={'Person'}
+        
         name={profileUser.displayName}
         url={`https://simple-blog-by-pas.vercel.app/profile/${profileUser.id}`}
         sameAs={[profileUser.gitHubURL, profileUser.websiteURL]}
       />
       <NextSeo
+    
         title={profileUser.displayName}
         description={profileUser.description}
         canonical={`https://simple-blog-by-pas.vercel.app/profile/${profileUser.id}`}
