@@ -1,5 +1,5 @@
 import { colord } from 'colord';
-import { FC, ReactNode } from 'react';
+import { FC, KeyboardEventHandler, MouseEventHandler, ReactNode, useEffect } from 'react';
 import styled from 'styled-components';
 import Subtitle from '../Subtitle';
 
@@ -16,8 +16,9 @@ const DialogMainContainer = styled.div`
 `;
 
 const DialogContentContainer = styled.div`
-  padding: 1em;
+  padding: 1rem;
   transition: 0.4s easy all;
+  position: relative;
   border: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.42).toHex()};
   border-radius: 8px;
   margin: 20px;
@@ -47,8 +48,22 @@ const Dialog: FC<{
   title: string;
   plusZIndex?: number;
   isIsolated?: boolean;
-}> = ({ isOpen, title, plusZIndex = 0, utilsChildren, contentChildren, isIsolated = false }) => {
+  handleCloseDialog?: () => void;
+}> = ({ isOpen, title, plusZIndex = 0, utilsChildren, contentChildren, isIsolated = false, handleCloseDialog }) => {
+  const handleCloseOnEsc: KeyboardEventHandler<Document> = ({ key }) => {
+    if (key === 'Escape') handleCloseDialog && handleCloseDialog();
+  };
+
+  useEffect(() => {
+    document && document.addEventListener('keydown', handleCloseOnEsc as any, false);
+
+    return () => {
+      document && document.removeEventListener('keydown', handleCloseOnEsc as any, false);
+    };
+  }, []);
+
   if (!isOpen) return <></>;
+
   return (
     //@ts-ignore
     <DialogContainer style={{ zIndex: 100 + plusZIndex }} isIsolated={isIsolated}>
