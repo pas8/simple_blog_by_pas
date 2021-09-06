@@ -2,9 +2,10 @@ import { useRouter } from 'next/dist/client/router';
 import { FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
+import { useCheckForAccess } from '../../hooks/useCheckForAccess.hook';
 import { ChatMessageMenuPropsType } from '../../models/types';
 import { toChangeMessageMenuProperties } from '../../store/modules/App/actions';
-import { getMessageMenuProperties } from '../../store/modules/App/selectors';
+import { getMessageMenuProperties, getUser } from '../../store/modules/App/selectors';
 import SearchLabel from '../CreatingPostPart/components/SearchLabel';
 import TextArea from '../CreatingPostPart/components/TextArea';
 import Text from '../Text';
@@ -24,6 +25,7 @@ const ChatMessageMenu: FC<ChatMessageMenuPropsType> = ({
   const dispatch = useDispatch();
   const { push } = useRouter();
   const handleCloseMenu = () => dispatch(toChangeMessageMenuProperties({ messageMenuProperties: null }));
+  const user = useSelector(getUser);
 
   useEffect(() => {
     setMessageValue(messageMenuProperties?.value || '');
@@ -35,7 +37,7 @@ const ChatMessageMenu: FC<ChatMessageMenuPropsType> = ({
   if (!messageMenuProperties) return <></>;
   const { x, y, ...messageProps } = messageMenuProperties;
   const notPrivateUtils =
-    isPrivateMode && !messageMenuProperties.isSelfMessage
+    isPrivateMode && !messageMenuProperties.isSelfMessage && !useCheckForAccess(user?.rank!)
       ? ['Save', 'Delete']
       : !messageMenuProperties.isSelfMessage
       ? ['Save']

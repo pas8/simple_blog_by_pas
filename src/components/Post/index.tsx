@@ -57,6 +57,10 @@ const PostContainer = styled.div`
       color: ${({ theme: { text } }) => text};
     };
     &:hover{
+      & *::selection{
+        background: ${({ theme: { primary,background } }) => background};
+        color:${({ theme: { primary} }) => primary};
+      }
       & .commentItemContainer path {
 
         fill:${({ theme: { background } }) => colord(background).alpha(0.42).toHex()};
@@ -173,7 +177,7 @@ const CommentContainer = styled.div`
 `;
 const TextPost = styled(Text)`
   margin: 10px 0;
-  word-break: break-word;
+
 `;
 const DateContainer = styled(Caption)`
   padding: 4px 6px;
