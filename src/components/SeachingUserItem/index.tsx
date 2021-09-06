@@ -1,15 +1,17 @@
 import { useRouter } from 'next/dist/client/router';
+import Link from 'next/link';
 import { FC } from 'react';
 import styled from 'styled-components';
 import { useFindRankD } from '../../hooks/useFindRankD.hook';
 import { useValidateColor } from '../../hooks/useValidateColor.hook';
+import { useValidateNumber } from '../../hooks/useValidateNumber.hook';
 import { ProfileType } from '../../models/types';
 import ChatsPreviewItemContainer from '../ChatsPreviewItem/components/ChatsPreviewItemContainer';
 import CrownPreviewContainer from '../CrownPreviewContainer';
 import Subtitle from '../Subtitle';
 const ContentContainer = styled.div`
   display: flex;
-  width:100%;
+  width: 100%;
   justify-content: space-between;
 
   position: relative;
@@ -17,36 +19,42 @@ const ContentContainer = styled.div`
 
 const CrownContainer = styled.div`
   border-radius: 50%;
+  margin-left:16px;
   width: 2.8rem;
   white-space: nowrap;
   & svg {
-
-    margin-left:-2px;
+    margin-left: -2px;
   }
   height: 2.8rem;
   display: grid;
   place-items: center;
-  border: 1px solid ;
+  border: 1px solid;
   & > div {
-
     display: flex;
   }
 `;
 
 const Container = styled(ChatsPreviewItemContainer)`
-&:hover {
+& a {
+position:absolute;
+inset:0
 
-  & .crownContainer {
-    color: ${({ theme: { background } }) => background};
-  }
-`
+}
+&:hover {
+  color: ${({ theme: { background } }) => background};
+& h6 {
+
+  text-decoration:underline;
+
+}
+`;
 
 const SeachingUserItem: FC<ProfileType> = ({ id, rank, displayName, primaryColor, photoURL, crowns }) => {
-  const { push } = useRouter();
   const color = useValidateColor(primaryColor || '');
   const d = useFindRankD(rank);
+
   return (
-    <Container color={color} onClick={() => push(`/profile/${id}`)}>
+    <Container color={color}>
       <ContentContainer>
         <Subtitle>
           {<img src={photoURL} width={48} height={48} />}
@@ -59,7 +67,7 @@ const SeachingUserItem: FC<ProfileType> = ({ id, rank, displayName, primaryColor
 
         <CrownContainer className={'crownContainer'}>
           <div>
-            {crowns.length}
+            {useValidateNumber(crowns.length)}
 
             <svg viewBox="0 0 24 24" width={22} height={22}>
               <path
@@ -72,6 +80,7 @@ const SeachingUserItem: FC<ProfileType> = ({ id, rank, displayName, primaryColor
           </div>
         </CrownContainer>
       </ContentContainer>
+      <Link href={`/profile/${id}`}> </Link>
     </Container>
   );
 };

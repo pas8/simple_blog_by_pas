@@ -137,7 +137,7 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
   const [queryUsers, setQueryUsers] = useState<ProfileType[]>([] as ProfileType[]);
   const [selectedUsers, setSelectedUsers] = useState<string[]>(state.collaborators);
   const [searchValue, setSearchValue] = useState('');
-  const on: ChangeEventHandler<HTMLInputElement> = ({ target: { value } }) => {
+  const onChangeOfSearch: ChangeEventHandler<HTMLInputElement> = ({ target: { value } }) => {
     useSearchUsers(value, setSearchValue, setQueryUsers);
   };
   const handleSaveCollobarators = () => {
@@ -153,7 +153,7 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
         title={'Add collobarators'}
         contentChildren={
           <DialogContentContainer>
-            <TitleInput onChange={on} value={searchValue} placeholder={'*start search with @ or $'} autoFocus />
+            <TitleInput onChange={onChangeOfSearch} value={searchValue} placeholder={'*start search with @ or $'} autoFocus />
             <div className={'containerOfSearchLabel'}>
               {selectedUsers.map(id => (
                 <SearchLabel key={id} id={id} />

@@ -22,10 +22,9 @@ const ChatsPreviewIem: FC<{ id: string }> = ({ id }) => {
       {<img src={chatUser?.photoURL || ''} width={48} height={48} />}
 
       <Subtitle>
-        {' '}
         <svg viewBox={'0 0 24 24'} width={42} height={42}>
           <path d={d} fill={'currentcolor'} />
-        </svg>{' '}
+        </svg>
         {chatUser?.displayName || 'Loading'}
       </Subtitle>
     </ChatsPreviewItemContainer>
