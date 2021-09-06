@@ -63,7 +63,7 @@ export const getServerSideProps: GetServerSideProps = async ({ query: { id } }) 
 
   return {
     props: {
-      posts,
+      posts: posts.sort(({ created }, __) => __.created - created),
       id
     }
   };

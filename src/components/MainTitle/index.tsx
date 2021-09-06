@@ -1,5 +1,8 @@
+import useWindowSize from '../../hooks/useWindowSize.hook';
+
 const MainTitle = () => {
-  return <> {window.innerWidth > 1024 ? 'Simple blog' : 'SB'}</>;
+  const { width } = useWindowSize();
+  return <> {width > 1224 ? 'Simple blog' : 'SB'}</>;
 };
 
 export default MainTitle;

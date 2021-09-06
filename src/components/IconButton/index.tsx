@@ -22,13 +22,14 @@ const Button = styled.svg`
 
 const IconButton: FC<{
   d: string;
+  caption?:string;
   position?: string;
   onClick?: (e?: any) => void;
   dimensions?: { [Property in 'top' | 'left' | 'right' | 'bottom']?: string | number };
-}> = ({ d, onClick, dimensions = {}, children, position = 'absolute', ...props }) => {
+}> = ({ d, onClick, dimensions = {}, children, position = 'absolute',caption, ...props }) => {
   return (
     //@ts-ignore
-    <Button viewBox={'0 0 24 24'} onClick={onClick} style={{ position, ...dimensions }}>
+    <Button viewBox={'0 0 24 24'} onClick={onClick} style={{ position, ...dimensions }} aria-label={caption}>
       <path d={d}></path>
       {children}
     </Button>
