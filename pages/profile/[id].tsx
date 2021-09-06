@@ -1,7 +1,7 @@
 import { collection, query, where, getDocs, getDoc, doc, updateDoc, setDoc } from 'firebase/firestore';
 import { useRouter } from 'next/dist/client/router';
-import { ChangeEventHandler, FC, ReactNode, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { ChangeEventHandler, FC, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { HexColorPicker } from 'react-colorful';
 import styled from 'styled-components';
 
@@ -31,6 +31,7 @@ import { useFindRankD } from '../../src/hooks/useFindRankD.hook';
 import RankSystem from '../../src/components/RankSystem';
 import { useUploadUsersTheme } from '../../src/hooks/useUploadUsersTheme.hook';
 import { colord } from 'colord';
+import CrownPreviewContainer from '../../src/components/CrownPreviewContainer';
 
 const ProfileContainer = dynamic(() => import('../../src/components/ProfileContainer'), { ssr: false });
 
@@ -109,36 +110,7 @@ const ProfilePropertiesContainer = styled.div`
   }
 `;
 
-const CrownPreviewContainer = styled.div`
-  border-radius: 8px;
-  background: ${({ theme: { background } }) => background};
-  color: ${({
-    theme: { text, primary },
-    //@ts-ignore
-    isCrownWasGiven
-  }) => (isCrownWasGiven ? primary : text)};
-  font-size: 1rem;
-  border: 1px solid;
-  &:hover {
-    border-color: ${({
-      theme: { text, primary },
-      //@ts-ignore
-      isCrownWasGiven
-    }) => (isCrownWasGiven ? primary : text)};
-    color: ${({ theme: { background } }) => background};
-    background: ${({
-      theme: { text, primary },
-      //@ts-ignore
-      isCrownWasGiven
-    }) => (isCrownWasGiven ? primary : text)};
-    cursor: pointer;
-  }
-  display: flex;
-  top: -4px;
-  right: -4px;
-  position: absolute;
-  align-items: center;
-`;
+
 
 const DescriptionGitHubWebSiteContainer = styled.div`
   border: 1px solid;
@@ -241,7 +213,8 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
       const ref = doc(db, 'users', profileUser.id);
       const c = isCrownWasGiven ? crowns.filter(id => id !== user?.id) : [...crowns, user?.id];
       await updateDoc(ref, {
-        crowns: c
+        crowns: c,
+        crownsLength: c.length
       });
       setCrowns(c);
     } catch (error) {
@@ -288,7 +261,7 @@ const Profile: FC<{ posts: PostType[]; profileUser: ProfileDocType & { id: strin
                 theme: 'colored',
                 position: 'bottom-right'
               });
-              setIsCensureDialogOpen(true)
+              setIsCensureDialogOpen(true);
             })
             .catch(error => {
               console.log(error);

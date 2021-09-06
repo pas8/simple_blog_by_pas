@@ -25,6 +25,7 @@ import { useSelector } from 'react-redux';
 import { getUser } from '../../store/modules/App/selectors';
 import TitleInput from './components/TitleInput';
 import TextArea from './components/TextArea';
+import { useSearchUsers } from '../../hooks/useSearchUsers.hook';
 
 const AddPostButton = styled(Button)``;
 const DialogContentContainer = styled.div`
@@ -136,20 +137,8 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
   const [queryUsers, setQueryUsers] = useState<ProfileType[]>([] as ProfileType[]);
   const [selectedUsers, setSelectedUsers] = useState<string[]>(state.collaborators);
   const [searchValue, setSearchValue] = useState('');
-  const on: ChangeEventHandler<HTMLInputElement> = async ({ target: { value } }) => {
-    setSearchValue(value);
-    const isName = value.startsWith('$');
-    const isEmail = value.startsWith('@');
-    if ((!isEmail && !isName) || value.length === 1) return setQueryUsers([]);
-    const str = value.slice(1);
-    const q = query(collection(db, 'users'), orderBy(isName ? 'displayName' : 'email'), startAt(str), endAt(str + '~'));
-    const querySnapshot = await getDocs(q);
-    const users: ProfileType[] = [];
-
-    querySnapshot.forEach(async doc => {
-      users.push({ ...doc.data(), id: doc.id } as ProfileType);
-    });
-    setQueryUsers(users);
+  const onChangeOfSearch: ChangeEventHandler<HTMLInputElement> = ({ target: { value } }) => {
+    useSearchUsers(value, setSearchValue, setQueryUsers);
   };
   const handleSaveCollobarators = () => {
     setState(state => ({ ...state, collaborators: selectedUsers }));
@@ -164,7 +153,7 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
         title={'Add collobarators'}
         contentChildren={
           <DialogContentContainer>
-            <TitleInput onChange={on} value={searchValue} placeholder={'*start search with @ or $'} autoFocus />
+            <TitleInput onChange={onChangeOfSearch} value={searchValue} placeholder={'*start search with @ or $'} autoFocus />
             <div className={'containerOfSearchLabel'}>
               {selectedUsers.map(id => (
                 <SearchLabel key={id} id={id} />

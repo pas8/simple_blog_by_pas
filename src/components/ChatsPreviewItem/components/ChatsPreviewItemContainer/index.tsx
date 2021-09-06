@@ -2,9 +2,10 @@ import { colord } from 'colord';
 import styled from 'styled-components';
 
 export default styled.div`
+position: relative;
   opacity: ${({
     //@ts-ignore
-    isHaveAccess =true
+    isHaveAccess = true
   }) => (isHaveAccess ? 1 : 0.42)};
   border-bottom: 1px solid ${({ theme: { text } }) => colord(text).alpha(0.16).toHex()};
   display: flex;
@@ -21,16 +22,24 @@ export default styled.div`
     margin-right: 8px;
     border-radius: 50%;
   }
+
   & h6 {
-    word-break: break-word;
+    display: flex;
+    align-items: center;
   }
   &:hover {
     cursor: pointer;
     & img {
       border-color: ${({ theme: { background } }) => background};
     }
+  
     & h6 {
       color: ${({ theme: { background } }) => background};
+      & svg {
+        & path {
+          fill: ${({ theme: { background } }) => background};
+        }
+      }
     }
     background: ${({ color }) => color};
   }
