@@ -25,7 +25,7 @@ import CloseButton from '../CloseButton';
 const DialogMenuContentContainer = styled(FlexContainerWithBorder)`
   flex-direction: column;
   margin-top: 12px;
-  width:100%;
+  width: 100%;
   & .item {
     padding: 8px;
     gap: 16px;
@@ -119,7 +119,7 @@ const HeaderMenu = () => {
       });
       dispatch(
         toChangeThemePropertyies({
-          themePropertyies: { ...mapValues(theme, el => colord(el).invert().toHex()) }
+          themePropertyies: { ...mapValues(theme, el => colord(el).invert().toHex()), primary: theme.primary }
         })
       );
     } catch (error) {
@@ -194,7 +194,7 @@ const HeaderMenu = () => {
                 <DialogMenuContentContainer>
                   {menuItemsArr.map(({ d, onClick, caption }) => {
                     return (
-                      <Subtitle onClick={onClick} className={'item'}>
+                      <Subtitle onClick={onClick} className={'item'} key={d}>
                         <svg viewBox={'0 0 24 24'} width={42} height={42}>
                           <path d={d} fill={'currentcolor'} />
                         </svg>
@@ -210,7 +210,7 @@ const HeaderMenu = () => {
                 {
                   //@ts-ignore
                   <Button isDangerous>
-                    <svg viewBox={'0 0 24 24'} width={28} height={28} style={{marginRight:4}} >
+                    <svg viewBox={'0 0 24 24'} width={28} height={28} style={{ marginRight: 4 }}>
                       <path
                         fill={'currentcolor'}
                         d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67l-2.58 2.59zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"
