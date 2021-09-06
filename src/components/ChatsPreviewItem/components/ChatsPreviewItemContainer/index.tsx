@@ -2,7 +2,7 @@ import { colord } from 'colord';
 import styled from 'styled-components';
 
 export default styled.div`
-position: relative;
+  position: relative;
   opacity: ${({
     //@ts-ignore
     isHaveAccess = true
@@ -32,7 +32,7 @@ position: relative;
     & img {
       border-color: ${({ theme: { background } }) => background};
     }
-  
+
     & h6 {
       color: ${({ theme: { background } }) => background};
       & svg {

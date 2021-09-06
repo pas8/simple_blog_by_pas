@@ -1,6 +1,7 @@
 import { useRouter } from 'next/dist/client/router';
 import { FC } from 'react';
 import styled from 'styled-components';
+import { Optional } from 'utility-types';
 import Container from '../Container';
 import IconButton from '../IconButton';
 
@@ -12,7 +13,7 @@ const Wrapper = styled(Container)`
   }
   position: relative;
 `;
-const CenteredContainerWithBackButton: FC = ({ children }) => {
+const CenteredContainerWithBackButton: FC<{ divProps?: HTMLDivElement }> = ({ children, divProps }) => {
   const { back } = useRouter();
   // !!window &&   window.scrollTo(0,60 )
   return (
@@ -24,7 +25,10 @@ const CenteredContainerWithBackButton: FC = ({ children }) => {
         dimensions={{ top: 16 }}
       />
       <Wrapper>
-        <div> {children} </div>
+        {
+          //@ts-ignore
+          <div {...divProps}> {children} </div>
+        }
       </Wrapper>
     </>
   );

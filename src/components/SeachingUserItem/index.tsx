@@ -1,4 +1,3 @@
-import { useRouter } from 'next/dist/client/router';
 import Link from 'next/link';
 import { FC } from 'react';
 import styled from 'styled-components';
@@ -7,8 +6,8 @@ import { useValidateColor } from '../../hooks/useValidateColor.hook';
 import { useValidateNumber } from '../../hooks/useValidateNumber.hook';
 import { ProfileType } from '../../models/types';
 import ChatsPreviewItemContainer from '../ChatsPreviewItem/components/ChatsPreviewItemContainer';
-import CrownPreviewContainer from '../CrownPreviewContainer';
 import Subtitle from '../Subtitle';
+
 const ContentContainer = styled.div`
   display: flex;
   width: 100%;
@@ -19,12 +18,14 @@ const ContentContainer = styled.div`
 
 const CrownContainer = styled.div`
   border-radius: 50%;
-  margin-left:16px;
+  margin-left: 16px;
   width: 2.8rem;
+
   white-space: nowrap;
   & svg {
     margin-left: -2px;
   }
+
   height: 2.8rem;
   display: grid;
   place-items: center;
@@ -35,26 +36,52 @@ const CrownContainer = styled.div`
 `;
 
 const Container = styled(ChatsPreviewItemContainer)`
-& a {
-position:absolute;
-inset:0
+  & a {
+    position: absolute;
+    inset: 0;
+  }
+  & .crownContainer {
 
-}
-&:hover {
-  color: ${({ theme: { background } }) => background};
-& h6 {
+    color: ${({
+      //@ts-ignore
+      isCrownWasGiven,color
+    }) => (!isCrownWasGiven ? 'currentcolor' : color)};
+  }
 
-  text-decoration:underline;
+  &:hover {
+    color: ${({ theme: { background } }) => background};
+    & h6 {
+      text-decoration: underline;
+    }
 
-}
+    & .crownContainer {
+      background: ${({
+        theme,
+        //@ts-ignore
+        isCrownWasGiven
+      }) => (!isCrownWasGiven ? 'transparent' : theme.background)};
+      color: ${({
+        //@ts-ignore
+        isCrownWasGiven,color
+      }) => (!isCrownWasGiven ? 'currentcolor' : color)};
+    }
+  }
 `;
 
-const SeachingUserItem: FC<ProfileType> = ({ id, rank, displayName, primaryColor, photoURL, crowns }) => {
+const SeachingUserItem: FC<ProfileType & { isCrownWasGiven: boolean }> = ({
+  id,
+  rank,
+  displayName,
+  primaryColor,
+  photoURL,
+  crowns,
+  isCrownWasGiven
+}) => {
   const color = useValidateColor(primaryColor || '');
   const d = useFindRankD(rank);
-
   return (
-    <Container color={color}>
+    //@ts-ignore
+    <Container color={color} isCrownWasGiven={isCrownWasGiven}>
       <ContentContainer>
         <Subtitle>
           {<img src={photoURL} width={48} height={48} />}
