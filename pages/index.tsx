@@ -14,6 +14,7 @@ import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
 import PostMasonry from '../src/components/PostMasonry';
 import CommentMenu from '../src/components/CommentMenu';
+import { BlogJsonLd } from 'next-seo';
 
 const MainTitle = dynamic(() => import('../src/components/MainTitle'), { ssr: false });
 const HeaderMenu = dynamic(() => import('../src/components/HeaderMenu'));
@@ -68,6 +69,18 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
 
   return (
     <>
+      <BlogJsonLd
+        dateModified={new Date(posts[0].created).toLocaleString()}
+        datePublished={new Date(posts[0].created).toLocaleString()}
+        url={'https://simple-blog-by-pas.vercel.app'}
+        title={'Simple blog'}
+        images={posts.map(({ bg_image }) => bg_image)}
+        authorName={'PAS'}
+        description={
+          'This is a open sourse blog pltform, where every can write blogs, which will publish to main blog, where eryone can see your post.'
+        }
+      />
+
       <CommentMenu />
       <Container>
         <Title>
