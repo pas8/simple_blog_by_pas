@@ -79,11 +79,6 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
   const { push } = useRouter();
   const dispatch = useDispatch();
   const user = useSelector(getUser);
-  const themePropertyies = useSelector(getThemePropertyies);
-  // console.log(user)
-  // useEffect(() => {
-  // dispatch(toChangeThemePropertyies({ themePropertyies: { ...themePropertyies, primary: user?.primaryColor } }));
-  // }, [user?.primaryColor]);
 
   const isAuth = !!user;
 
@@ -118,33 +113,41 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
 
   const handleAuthorisate = async () => {
     const provider = new GoogleAuthProvider();
-
-    const { user } = await signInWithPopup(auth, provider);
-    const { uid, photoURL, displayName, email } = user;
-    const docRef = doc(db, 'users', uid);
-
-    const docSnap = await getDoc(docRef);
-
     try {
-      if (!docSnap.exists()) {
-        const f = await setDoc(doc(db, 'users', uid), {
-          photoURL,
-          gitHubURL: '',
-          websiteURL: '',
-          rank: RankVariants.HASTATI,
-          crowns: [],
-          description: '',
-          isThemeDark: true,
-          primaryColor: '#FFEA00',
-          displayName,
-          email
+      const { user } = await signInWithPopup(auth, provider);
+      const { uid, photoURL, displayName, email } = user;
+      const docRef = doc(db, 'users', uid);
+
+      const docSnap = await getDoc(docRef);
+
+      try {
+        if (!docSnap.exists()) {
+          const f = await setDoc(doc(db, 'users', uid), {
+            photoURL,
+            gitHubURL: '',
+            websiteURL: '',
+            rank: RankVariants.HASTATI,
+            crowns: [],
+            description: '',
+            isThemeDark: true,
+            primaryColor: '#FFEA00',
+            displayName,
+            email
+          });
+        }
+        toast('Successfully log in!', {
+          type: 'success',
+          theme: 'colored',
+          position: 'bottom-right'
+        });
+      } catch (error) {
+        console.log(error);
+        toast('Something went wrong!', {
+          type: 'error',
+          theme: 'colored',
+          position: 'bottom-right'
         });
       }
-      toast('Successfully log in!', {
-        type: 'success',
-        theme: 'colored',
-        position: 'bottom-right'
-      });
     } catch (error) {
       console.log(error);
       toast('Something went wrong!', {
