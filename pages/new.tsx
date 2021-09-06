@@ -7,11 +7,12 @@ import { getUser } from '../src/store/modules/App/selectors';
 import CreatingPostPart from '../src/components/CreatingPostPart';
 import { InputsNames } from '../src/models/denotation';
 import { db } from '../src/layouts/FirebaseLayout';
+import { useUnLoginedUserDefender } from '../src/hooks/useUnLoginedUserDefender.hook';
 
 const New = () => {
   const nullityState = { [InputsNames.TITLE]: '', [InputsNames.TEXT]: '', bg_image: '', collaborators: [] as string[] };
-  const user = useSelector(getUser);
-
+  const [condition, placeholder, user] = useUnLoginedUserDefender();
+  if (condition) return placeholder;
   const [state, setState] = useState(nullityState);
   const { push } = useRouter();
 

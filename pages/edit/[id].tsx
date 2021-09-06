@@ -8,6 +8,8 @@ import Button from '../../src/components/Button';
 import CreatingPostPart from '../../src/components/CreatingPostPart';
 import Dialog from '../../src/components/Dialog';
 import IconButton from '../../src/components/IconButton';
+import { useCheckForAccess } from '../../src/hooks/useCheckForAccess.hook';
+import { useUnLoginedUserDefender } from '../../src/hooks/useUnLoginedUserDefender.hook';
 import { db } from '../../src/layouts/FirebaseLayout';
 import { InputsNames } from '../../src/models/denotation';
 import { PostType } from '../../src/models/types';
@@ -21,13 +23,19 @@ const EditPostPage: FC<{ post: PostType }> = ({ post }) => {
     collaborators: post?.collaborators || []
   };
   const [state, setState] = useState(nullityState);
-console.log(state.bg_image)
 
   const {
     push,
     query: { id }
   } = useRouter();
   const user = useSelector(getUser);
+
+  const [condition, placeholder] = useUnLoginedUserDefender(
+    user?.id,
+    user?.id !== post.maintainer && !post.collaborators.includes(user?.id!) && !useCheckForAccess(user?.rank!)
+  );
+  if (condition) return placeholder;
+
   const ref = doc(db, 'posts', id as string);
 
   const handleChangePost = async () => {

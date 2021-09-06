@@ -6,14 +6,14 @@ import { ProfileType } from '../models/types';
 import { toast } from 'react-toastify';
 
 export const useUnLoginedUserDefender = (
-  id: string,
+  id?: string,
   aditionalCondition: boolean = false
 ): [boolean, any, ProfileType] => {
   const user = useSelector(getUser);
 
   const { push } = useRouter();
 
-  const isUserPage = user?.id === id;
+  const isUserPage = user?.id === (id || user?.id);
   const isCondition = !isUserPage || aditionalCondition;
 
   useEffect(() => {
