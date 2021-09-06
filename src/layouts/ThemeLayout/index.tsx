@@ -1,4 +1,4 @@
-import { colord } from 'colord';
+import { colord, extend } from 'colord';
 import { mapValues } from 'lodash';
 import { FC, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,10 +7,32 @@ import MainContainer from '../../components/MainContainer';
 import { device } from '../../models/denotation';
 import { toChangeThemePropertyies } from '../../store/modules/App/actions';
 import { getThemePropertyies, getUser } from '../../store/modules/App/selectors';
+import mixPlugin from 'colord/plugins/mix';
 
 const GlobalStyle = createGlobalStyle`*{
   word-break: break-word;
-
+  &::selection{
+    color:${({ theme: { background } }) => background};
+    background: ${({ theme: { primary } }) => primary};
+  }
+  &::-webkit-scrollbar              { 
+    background:transparent;
+    width:8px;
+  };
+  &::-webkit-scrollbar-button       {
+    display:none;
+  }
+  &::-webkit-scrollbar-thumb {  
+    background: ${({ theme: { background, primary } }) => {
+      extend([mixPlugin]);
+      return colord(background).alpha(0.16).mix(primary, 0.8).toHex();
+    }};
+    border-radius:8px;
+    &:hover{
+    background: ${({ theme: { primary } }) => primary};
+     
+    }
+  }
 };
 a {
   text-decoration: none;
