@@ -14,7 +14,8 @@ import { toast } from 'react-toastify';
 import dynamic from 'next/dynamic';
 import PostMasonry from '../src/components/PostMasonry';
 import CommentMenu from '../src/components/CommentMenu';
-import { BlogJsonLd } from 'next-seo';
+import { BlogJsonLd,NextSeo } from 'next-seo';
+import { useImgSeo, } from '../src/hooks/useImgSeo.hook';
 
 const MainTitle = dynamic(() => import('../src/components/MainTitle'), { ssr: false });
 const HeaderMenu = dynamic(() => import('../src/components/HeaderMenu'));
@@ -79,6 +80,22 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
         description={
           'This is a open sourse blog pltform, where every can write blogs, which will publish to main blog, where eryone can see your post.'
         }
+      />
+
+      <NextSeo
+        title={'Simple blog'}
+        description={
+          'This is a open sourse blog pltform, where every can write blogs, which will publish to main blog, where eryone can see your post.'
+        }
+        canonical={`https://simple-blog-by-pas.vercel.app`}
+        openGraph={{
+          url: `https://simple-blog-by-pas.vercel.app`,
+          title: 'Simple blog',
+          description:
+            'This is a open sourse blog pltform, where every can write blogs, which will publish to main blog, where eryone can see your post.',
+          images: useImgSeo(posts),
+          site_name: 'Simple blog'
+        }}
       />
 
       <CommentMenu />
