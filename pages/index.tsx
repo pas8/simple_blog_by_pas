@@ -26,12 +26,23 @@ const AddButton = styled.button`
   box-shadow: 0px 5px 5px -3px ${({ theme: { primary } }) => colord(primary).alpha(0.2).toHex()},
     0px 8px 10px 1px ${({ theme: { primary } }) => colord(primary).alpha(0.14).toHex()},
     0px 3px 14px 2px ${({ theme: { primary } }) => colord(primary).alpha(0.12).toHex()};
-  border-radius: 50%;
-  width: 5.6rem;
+  border-radius: 16px;
+  height: auto;
+  padding: 0.92rem 1.8rem;
+  word-break: keep-all;
   cursor: pointer;
-  font-size: 2.8em;
-  height: 5.6rem;
+  font-size: 1.8em;
+  font-weight:600;
+  font-family: monospace;
   position: fixed;
+  display: flex;
+  align-item: center;
+  justify-content: center;
+  & svg {
+    & path {fill: ${({ theme: { background } }) =>  colord(background).alpha(1).toHex()};}
+margin: -2px 8px 0 -8px;
+    width: 1.8rem;
+  }
   bottom: 1.4rem;
 
   @media ${device.desktop} {
@@ -49,18 +60,19 @@ const AddButton = styled.button`
   @media ${device.mobileM} {
     right: 2vw;
   }
+  border: 1px solid ${({ theme: { background } }) => background};
 
-  border: 1px solid ${({ theme: { primary } }) => primary};
-  color: ${({ theme: { primary } }) => primary};
-  background: ${({ theme: { background } }) => background};
+  color: ${({ theme: { background } }) => background};
+  background: ${({ theme: { primary } }) => primary};
   transition: 0.4s ease all;
   &:focus {
     color: ${({ theme: { background } }) => background};
     background: ${({ theme: { primary } }) => primary};
   }
   &:hover {
-    color: ${({ theme: { background } }) => background};
-    background: ${({ theme: { primary } }) => primary};
+  border: 1px solid ${({ theme: { primary } }) => primary};
+
+    background: ${({ theme: { primary } }) => colord(primary).darken(0.42).toHex()};
   }
 `;
 
@@ -83,9 +95,7 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
 
       <NextSeo
         title={'Simple blog'}
-        description={
-          description
-        }
+        description={description}
         canonical={`https://simple-blog-by-pas.vercel.app`}
         openGraph={{
           url: `https://simple-blog-by-pas.vercel.app`,
@@ -115,7 +125,10 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
             : push('/new')
         }
       >
-        {'+'}
+        <svg focusable="false" viewBox="0 0 24 24">
+          <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM5.92 19H5v-.92l9.06-9.06.92.92L5.92 19zM20.71 5.63l-2.34-2.34c-.2-.2-.45-.29-.71-.29s-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41z"></path>
+        </svg>
+        {'Write'}
       </AddButton>
     </>
   );
