@@ -1,9 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { toast } from 'react-toastify';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
 import { useRouter } from 'next/dist/client/router';
-import { useSelector } from 'react-redux';
-import { getUser } from '../src/store/modules/App/selectors';
 import CreatingPostPart from '../src/components/CreatingPostPart';
 import { InputsNames } from '../src/models/denotation';
 import { db } from '../src/layouts/FirebaseLayout';
@@ -43,7 +41,27 @@ const New = () => {
         comments: [],
         maintainer: user?.id
       });
+
       if (!id) return;
+
+      state.collaborators.forEach(async id => {
+        const profileDoc = doc(db, 'users', id);
+        const profileUser = await getDoc(profileDoc);
+        const { email: toEmail } = profileUser.data() as any;
+
+        fetch('/api/email', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json, text/plain, */*',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ toEmail, byEmail: user?.email, postLink: '/me' })
+        }).catch(err => {
+          console.log(err)
+          toast('Something went wrong', { type: 'error', theme: 'colored', position: 'bottom-right' });
+        });
+      });
+
       toast('New posts was successfully added', { type: 'success', theme: 'colored', position: 'bottom-right' });
       setState(nullityState);
       push('/');
