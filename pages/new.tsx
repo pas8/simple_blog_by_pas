@@ -55,7 +55,7 @@ const New = () => {
             Accept: 'application/json, text/plain, */*',
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ toEmail, byEmail: user?.email, postLink: '/me' })
+          body: JSON.stringify({ toEmail, byEmail: user?.email, postLink: `https://simple-blog-by-pas.vercel.app/post/${id}` })
         }).catch(err => {
           console.log(err)
           toast('Something went wrong', { type: 'error', theme: 'colored', position: 'bottom-right' });
