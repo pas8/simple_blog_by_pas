@@ -58,8 +58,8 @@ const PostContainer = styled.div`
     };
     &:hover{
       & *::selection{
-        background: ${({ theme: { primary,background } }) => background};
-        color:${({ theme: { primary} }) => primary};
+        background: ${({ theme: { primary, background } }) => background};
+        color:${({ theme: { primary } }) => primary};
       }
       & .commentItemContainer path {
 
@@ -177,7 +177,6 @@ const CommentContainer = styled.div`
 `;
 const TextPost = styled(Text)`
   margin: 10px 0;
-
 `;
 const DateContainer = styled(Caption)`
   padding: 4px 6px;
@@ -292,6 +291,7 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
       });
     push(`/edit/${id}`);
   };
+
   return (
     <PostContainer key={`${title}_${text}_${created}`}>
       <PostTitle>
@@ -352,7 +352,8 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
       </PostUtilsContainer>
 
       {!!collaborators.length && (
-        <CollobaratorsContainer className={'postCollobaratorsContainer'}>
+        //@ts-ignore
+        <CollobaratorsContainer className={'postCollobaratorsContainer'} isCommentsExists={!!collaborators.length}>
           {collaborators.map(id => (
             <span key={id} onClick={() => push(`/profile/${id}`)}>
               <SearchLabel id={id} />
@@ -360,6 +361,7 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
           ))}
         </CollobaratorsContainer>
       )}
+
       {!!comments.length && (
         <CommentContainer className={'commentsContainer'}>
           {comments
