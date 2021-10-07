@@ -48,8 +48,9 @@ const IconButton: FC<{
   caption?: string;
   position?: string;
   onClick?: (e?: any) => void;
+  viewBox?:string;
   dimensions?: { [Property in 'top' | 'left' | 'right' | 'bottom']?: string | number };
-}> = ({ d, onClick, dimensions = {}, children, position = 'absolute', caption, ...props }) => {
+}> = ({ d, onClick, dimensions = {}, children, position = 'absolute', caption, viewBox= '0 0 24 24' }) => {
   const rippleRef = useRef({} as HTMLSpanElement);
 
   return (
@@ -70,7 +71,7 @@ const IconButton: FC<{
         onClick && onClick();
       }}
     >
-      <svg viewBox={'0 0 24 24'} aria-label={caption}>
+      <svg viewBox={viewBox} aria-label={caption}>
         <path d={d}></path>
         {children}
       </svg>
