@@ -1,4 +1,3 @@
-import { colord } from 'colord';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useRouter } from 'next/dist/client/router';
 import { FC, MouseEventHandler, useRef } from 'react';
@@ -16,6 +15,10 @@ import PostMasonry from '../src/components/PostMasonry';
 import CommentMenu from '../src/components/CommentMenu';
 import { BlogJsonLd, NextSeo } from 'next-seo';
 import { useImgSeo } from '../src/hooks/useImgSeo.hook';
+import { colord, extend } from "colord";
+import mixPlugin from "colord/plugins/mix";
+
+extend([mixPlugin]);
 
 const MainTitle = dynamic(() => import('../src/components/MainTitle'), { ssr: false });
 const HeaderMenu = dynamic(() => import('../src/components/HeaderMenu'));
@@ -74,7 +77,7 @@ const AddButton = styled.button`
   &:hover {
     border: 1px solid ${({ theme: { primary } }) => primary};
 
-    background: ${({ theme: { primary } }) => colord(primary).darken(0.42).toHex()};
+    background: ${({ theme: { primary ,background} }) => colord(primary).mix(background).toHex()};
   }
   overflow: hidden;
   & .ripple {

@@ -1,10 +1,11 @@
 import { colord } from 'colord';
 import { addDoc, collection, doc, getDocs, updateDoc } from 'firebase/firestore';
-import { FC, Fragment, useEffect, useState } from 'react';
+import { FC, Fragment, useEffect, useState, useRef } from 'react';
 import TextareaAutosize from 'react-textarea-autosize';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
-import Text from '../Text';
+import Text from '../Text'; //@ts-ignore
+import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import { db } from '../../layouts/FirebaseLayout';
 import { CommentType, PostType, RankVariants } from '../../models/types';
 import { useRouter } from 'next/dist/client/router';
@@ -175,7 +176,7 @@ const CommentContainer = styled.div`
   border-radius: 8px;
   overflow: hidden;
 `;
-const TextPost = styled(Text)`
+const TextPost = styled.div`
   margin: 10px 0;
 `;
 const DateContainer = styled(Caption)`
@@ -292,6 +293,47 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
     push(`/edit/${id}`);
   };
 
+  let previewGalleryImg = [] as string[];
+  const textContent = text.split('[').map(str => {
+    if (!str.includes(']')) return <Fragment key={str}>{str} </Fragment>;
+    const splitedStr = str.split(']');
+
+    if (isPreviewMode) {
+      splitedStr[0].split(',').forEach(el => previewGalleryImg.push(el));
+
+      return <Fragment key={str}>{splitedStr[1]}</Fragment>;
+    }
+    return (
+      <Fragment key={str}>
+      <div style={{margin:'8px 0'}}>
+        <ResponsiveMasonry columnsCountBreakPoints={{ 3000: splitedStr[0].split(',').length }}>
+          <Masonry gutter={'10px'}>
+            {splitedStr[0].split(',').map(src => (
+              <img key={src} src={src} style={{ width: '100%', height: '100%', borderRadius: '8px',aspectRatio: splitedStr[0].split(',').length  == 1 ?'auto' : '1', objectFit: 'cover',}}></img>
+            ))}
+          </Masonry>
+        </ResponsiveMasonry>
+        </div>
+
+        <span>{splitedStr[1]}</span>
+      </Fragment>
+    );
+  });
+
+  const ref = useRef({} as any);
+  useEffect(() => {
+    if(!isPreviewMode) return;
+    const newHtml =
+      ref.current.innerText.length > 292 && ref.current.innerText.split('.').length > 2
+        ? ref.current.innerText
+            .split('.')
+            .filter((__:any, idx:any) => idx < 2)
+            .join('')
+        : ref.current.innerText;
+
+    ref.current.innerText = newHtml;
+  }, [ref,isPreviewMode]);
+
   return (
     <PostContainer key={`${title}_${text}_${created}`}>
       <PostTitle>
@@ -307,9 +349,26 @@ const Post: FC<PostType & { isPreviewMode?: boolean }> = ({
       </PostTitle>
       <ImgContainer onDoubleClick={handleChangeLikedStatus}>
         <Img src={bg_image} />
+        {!!previewGalleryImg?.length && (
+          <div style={{ marginBottom: 10, marginTop: 4 }}>
+            <ResponsiveMasonry columnsCountBreakPoints={{ 3000: previewGalleryImg.length }}>
+              <Masonry gutter={'8px'}>
+                {previewGalleryImg.map(src => (
+                  <img
+                  key={src}
+                    src={src}
+                    style={{ width: '100%', height: '100%', borderRadius: '8px', aspectRatio: '1', objectFit: 'cover' }}
+                  ></img>
+                ))}
+              </Masonry>
+            </ResponsiveMasonry>
+          </div>
+        )}
         <DateContainer className={'dateContainer'}> {new Date(created).toLocaleString()}</DateContainer>
       </ImgContainer>
-      <TextPost>{isPreviewMode && text.length > 292 ? `${text.slice(0, 292)}...` : text}</TextPost>
+      <TextPost>
+        <span ref={ref}> {textContent} </span>
+      </TextPost>
       <PostUtilsContainer>
         {[
           {
