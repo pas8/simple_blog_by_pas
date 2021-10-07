@@ -1,10 +1,11 @@
-import { ChangeEventHandler, FC, useCallback,  useRef, useState } from 'react';
+import { ChangeEventHandler, FC, useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { useDropzone } from 'react-dropzone';
+import { useDropzone } from 'react-dropzone'; //@ts-ignore
+import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry';
 import { colord } from 'colord';
-import { CreatingPostPartPropsType,  ProfileType } from '../../models/types';
+import { CreatingPostPartPropsType, ProfileType } from '../../models/types';
 import { InputsNames } from '../../models/denotation';
 import Button from '../Button';
 import CenteredContainerWithBackButton from '../CenteredContainerWithBackButton';
@@ -89,6 +90,45 @@ const SearchContainer = styled.div`
   }
 `;
 
+const GaleryImgButton = styled.button`
+  width: 100%;
+  background: transparent;
+  outline: none;
+  border: none;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 8px;
+  cursor: pointer;
+  & img {
+    transition: 0.42s ease all;
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    filter: grayscale(1);
+    height: 100%;
+  }
+  &:hover {
+    & img {
+      filter: grayscale(0);
+    }
+  }
+  &.active {
+    position: relative;
+    &::before {
+      content: '✓';
+      color: ${({ theme: { background } }) => background};
+      font-size: 4.8rem;
+      display: grid;
+      z-index: 10;
+      place-items: center;
+      background: ${({ theme: { primary } }) => colord(primary).alpha(0.6).toHex()};
+      inset: 0;
+      position: absolute;
+    }
+  }
+`;
+
 const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
   submitButtonText = 'Add New Post',
   onClickOfSubmitButton,
@@ -103,10 +143,7 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
   const titleRef = useRef<HTMLDivElement>() as any;
   const [isSearchingDialogOpen, setIsSearchingDialogOpen] = useState(false);
 
-  const onDrop = useCallback(async acceptedFiles => {
-    const file = acceptedFiles?.[0];
-
-    if (!file) return;
+  const handleUploadPhotoToStorage = async (file: any) => {
     try {
       const storage = getStorage();
       const storageRef = ref(storage, `posts/${Math.random().toString(36)}_${Math.random().toString(36)}`);
@@ -114,10 +151,24 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
       await uploadBytes(storageRef, file);
 
       const bg_image = await getDownloadURL(storageRef);
-      setState(state => ({ ...state, bg_image }));
+      return [bg_image, null];
     } catch (error) {
-      toast('Something went wrond', { type: 'error', theme: 'dark', position: 'bottom-right' });
+      return [null, error];
     }
+  };
+
+  const onDrop = useCallback(async acceptedFiles => {
+    const file = acceptedFiles?.[0];
+
+    if (!file) return;
+
+    const [bg_image, error] = await handleUploadPhotoToStorage(file);
+    if (!!error) {
+      console.log(error);
+      return toast('Something went wrond', { type: 'error', theme: 'dark', position: 'bottom-right' });
+    }
+
+    setState(state => ({ ...state, bg_image }));
   }, []);
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
@@ -141,6 +192,28 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
     setSearchValue('');
     setIsSearchingDialogOpen(false);
   };
+  const [galleyImgesArr, setStateGalleyImgesArr] = useState([] as string[]);
+  const onDropOfGalleryDropZone = useCallback(async acceptedFiles => {
+    if (!acceptedFiles) return;
+
+    acceptedFiles.forEach(async (file: any) => {
+      const [bg_image, error] = await handleUploadPhotoToStorage(file);
+      if (!!error) {
+        console.log(error);
+        return toast('Something went wrond', { type: 'error', theme: 'colored', position: 'bottom-right' });
+      }
+
+      setStateGalleyImgesArr(state => [...state, bg_image]);
+    });
+  }, []);
+
+  const galleryDropZone = useDropzone({
+    onDrop: onDropOfGalleryDropZone,
+    accept: 'image/jpeg, image/png, image/svg',
+    maxFiles: 8
+  });
+
+
   return (
     <>
       <Dialog
@@ -148,7 +221,12 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
         title={'Add collobarators'}
         contentChildren={
           <DialogContentContainer>
-            <TitleInput onChange={onChangeOfSearch} value={searchValue} placeholder={'*start search with @ or $'} autoFocus />
+            <TitleInput
+              onChange={onChangeOfSearch}
+              value={searchValue}
+              placeholder={'*start search with @ or $'}
+              autoFocus
+            />
             <div className={'containerOfSearchLabel'}>
               {selectedUsers.map(id => (
                 <SearchLabel key={id} id={id} />
@@ -213,6 +291,34 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
           <div style={{ width: titleRef?.current?.offsetWidth }}>
             {!!state.bg_image && <ImgPreview src={state.bg_image} />}{' '}
           </div>
+
+          {!!galleyImgesArr.length && (
+            <ResponsiveMasonry columnsCountBreakPoints={{ 600: 2, 900: 3, 1400: 4, 1900: 4 }}>
+              <Masonry gutter={'10px'}>
+                {galleyImgesArr.map((src, idx) => (
+                  <GaleryImgButton
+                    key={src + idx}
+                    className={state.Text.includes(src) ? 'active' : ''}
+                    onClick={async () => {
+                      try {
+                        navigator.clipboard.writeText(src);
+                        toast('Image URL was copyied to your cliboard, paste it into place in text with []', {
+                          type: 'success',
+                          theme: 'colored',
+                          position: 'bottom-right'
+                        });
+                      } catch (error) {
+                        toast('Something went wrong', { type: 'error', theme: 'colored', position: 'bottom-right' });
+                      }
+                    }}
+                  >
+                    <img src={src}></img>
+                  </GaleryImgButton>
+                ))}
+              </Masonry>
+            </ResponsiveMasonry>
+          )}
+
           <CollobaratorsContainer>
             {(maintainer !== user?.id ? [maintainer, ...state.collaborators] : state.collaborators).map(id => (
               <SearchLabel key={id} id={id} />
@@ -220,6 +326,8 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
           </CollobaratorsContainer>
           <TitleInput
             autoFocus
+            //@ts-ignore
+            autoComplete={'off'}
             placeholder={InputsNames.TITLE}
             name={InputsNames.TITLE}
             value={state[InputsNames.TITLE]}
@@ -239,6 +347,15 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
               onClick={() => setIsSearchingDialogOpen(true)}
               d="M5 15v-3h3v-2H5V7H3v3H0v2h3v3zm7-1.25c-2.34 0-7 1.17-7 3.5V19h14v-1.75c0-2.33-4.66-3.5-7-3.5zM7.34 17c.84-.58 2.87-1.25 4.66-1.25s3.82.67 4.66 1.25H7.34zM12 12c1.93 0 3.5-1.57 3.5-3.5S13.93 5 12 5 8.5 6.57 8.5 8.5 10.07 12 12 12zm0-5c.83 0 1.5.67 1.5 1.5S12.83 10 12 10s-1.5-.67-1.5-1.5S11.17 7 12 7zm5 5c1.93 0 3.5-1.57 3.5-3.5S18.93 5 17 5c-.24 0-.48.02-.71.07.76.94 1.21 2.13 1.21 3.43 0 1.3-.47 2.48-1.23 3.42.24.05.48.08.73.08zm2.32 2.02c1 .81 1.68 1.87 1.68 3.23V19h3v-1.75c0-1.69-2.44-2.76-4.68-3.23z"
             />
+            <span {...galleryDropZone.getRootProps()}>
+              <IconButton
+                position={'relative'}
+                onClick={() => {}}
+                d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86-3 3.87L9 13.14 6 17h12l-3.86-5.14z"
+              />
+              <input {...galleryDropZone.getInputProps()} />
+            </span>
+
             <AddPostButton onClick={onClickOfSubmitButton}>{submitButtonText}</AddPostButton>
           </UtilsContainer>
         </div>
