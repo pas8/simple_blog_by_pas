@@ -197,7 +197,7 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
     if (!acceptedFiles) return;
 
     acceptedFiles.forEach(async (file: any) => {
-      const [bg_image, error] = await handleUploadPhotoToStorage(file);
+      const [bg_image, error] = await handleUploadPhotoToStorage(file) as  [string, any]
       if (!!error) {
         console.log(error);
         return toast('Something went wrond', { type: 'error', theme: 'colored', position: 'bottom-right' });
