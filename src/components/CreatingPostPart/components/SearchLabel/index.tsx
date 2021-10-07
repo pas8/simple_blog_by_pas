@@ -23,6 +23,7 @@ const SearchLabel: FC<{ id: string; maxNameLength?: number }> = ({ id, maxNameLe
   const [userProfileData, setUserProfileData] = useState<ProfileDocType>();
   useEffect(() => {
     const handleSetProfileData = async () => {
+      if (!id) return;
       const profileDoc = doc(db, 'users', id);
       const profileUser = await getDoc(profileDoc);
       setUserProfileData(profileUser.data() as ProfileDocType);

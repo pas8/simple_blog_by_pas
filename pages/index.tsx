@@ -113,18 +113,17 @@ const Index: FC<{ posts: PostType[] }> = ({ posts }) => {
     rippleRef.current.style.left = x + 'px';
     rippleRef.current.style.top = y + 'px';
 
-
     setTimeout(() => {
-      rippleRef.current.style.display = 'none';
+      if (!!rippleRef?.current?.style?.display) rippleRef.current.style.display = 'none';
+    }, 1000);
 
-      !user
-        ? toast('Only logined users can add posts! Please log in. ', {
-            type: 'error',
-            theme: 'colored',
-            position: 'bottom-right'
-          })
-        : push('/new');
-    }, 420);
+    !user
+      ? toast('Only logined users can add posts! Please log in. ', {
+          type: 'error',
+          theme: 'colored',
+          position: 'bottom-right'
+        })
+      : push('/new');
   };
 
   return (
