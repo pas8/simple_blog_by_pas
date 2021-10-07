@@ -162,7 +162,7 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
 
     if (!file) return;
 
-    const [bg_image, error] = await handleUploadPhotoToStorage(file);
+    const [bg_image, error]: [string, any] = await handleUploadPhotoToStorage(file);
     if (!!error) {
       console.log(error);
       return toast('Something went wrond', { type: 'error', theme: 'dark', position: 'bottom-right' });
@@ -212,7 +212,6 @@ const CreatingPostPart: FC<CreatingPostPartPropsType> = ({
     accept: 'image/jpeg, image/png, image/svg',
     maxFiles: 8
   });
-
 
   return (
     <>
