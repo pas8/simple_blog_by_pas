@@ -29,7 +29,9 @@ const InputContainer = styled.div`
     width: calc(100% - 62px);
     padding: 12px 56px 12px 8px;
   }
-  & svg {
+  & button {
+    width:2.6rem;
+    height:2.6rem;
     border: 0px;
   }
 `;
